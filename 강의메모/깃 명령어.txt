@@ -1,0 +1,53 @@
+open git bash here
+
+git init을 입력하면 .git 파일이 생기고 로컬 repository가 된다.
+로컬 저장소.
+
+git add .
+모든 파일을 add할거야 라는 의미
+
+git add 파일명
+이 파일을 add할거야
+
+stage, index
+add를 완료해서 커밋할 대상 파일들이 있는 곳
+
+commit 할 때는 무조건 메시지, 사람이름, 이메일 주소가 필요
+
+저장 공간들	working directory->index->local repository->원격 클라우드->다른 로컬 
+명령어들   	                              add     commit		   push		 pull
+
+commit은 한 작업이 끝나면 이력을 남기는 것.
+
+로컬 저장소를 클라우드에 동기화하고 싶을 때.
+push
+commit이력들도 같이 올라감.
+
+private 깃허브는 github 앞에 계정@ 를 붙여줘야됨
+
+원격 클라우드에 add
+git remote add origin https://ksryong0@github.com/ksryong0/SKN21.git
+
+
+
+컴퓨터를 키면
+0. git pull
+을 해서 최신 상태로 동기화.
+
+**커밋할 때**
+1. git status : 현재 저장소상태를 확인
+- 빨강색 파일명/디렉토리명 -> add할 대상이 있다.
+- 초록색 파일명/디렉토리명 -> commit할 대상이 있다.
+2. git add 파일명
+git add . (띄어쓰기 해야함)
+- staging/indexing
+- commit에 포함시킬 파일들을 추가.
+3. git commit -m "커밋메세지"
+4. git push
+- 로컬의 커밋을 원격과 동기화(로컬->원격 업로드)
+5. git clone url
+- 원격 저장소를 로컬에 복제해서 로컬저장소 생성.
+- 참고) git init : 로컬저장소를 생성
+
+충돌나면 코드 두개 다 보여줌. 그리고 에러메세지가 나옴.
+
