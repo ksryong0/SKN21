@@ -1,0 +1,30 @@
+내장 함수의 이름을 변수로 사용하면 object is not callable 에러가 뜬다!
+
+jumsu2 = [60, 90, 80, 80, 70, 55, 80, 90, 95, 85]
+
+max = 0
+for i in jumsu:
+    if i > max:
+        max = i
+print(max)
+
+del max
+max_value = max(jumsu2)
+max_value
+
+위 코드에서 max 함수를 max 변수로 사용했기 떄문에 not callabled 에러가 뜸.
+이럴 경우 del 명령어로 max 변수를 제거해주면 사용 가능.
+
+6번 리스트 컴프리헨션 가능?
+
+20-30 함수면
+20, 30 -> 피연산자, 입력값, 입력 파라미터
+
+파이썬에서 함수는 callable 이라고 함.
+
+일급시민객체 : 함수도 값이다. 함수도 변수에 넣어서 쓸 수 있다.
+
+입력값을 받는 함수
+파라미터-매개변수 : 0~N개 선언가능
+파라미터에 전달할 값 : argument
+파라미터는 함수 선언부. argument는 함수를 사용할 때.

@@ -1,0 +1,23 @@
+mysql 설치
+
+mysql.com 접속
+downloads
+mysql community downloads
+mysql installer for windows
+300메가짜리 다운로드
+no thanks
+
+다운로드하고
+
+Custom
+MySQL Server 최하위 파일을 오른쪽으로 보내기
+Applications->MySQL Workbench 최하위파일을 오른쪽으로 보내기
+Next
+Excute(체크하고해도됨)
+Next
+Excute
+Account and roles
+mysql root password	1111
+next 쭉
+excute
+--------------------------

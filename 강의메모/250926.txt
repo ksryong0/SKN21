@@ -1,0 +1,39 @@
+*파이썬 코딩 스타일 : 한줄에 72글자를 넘지 않도록 하기.
+
+리스트나 딕셔너리에서 pop명령은 반환하면서 삭제.
+del 명령은 그냥 삭제.
+
+a = {}
+빈(empty) 딕셔너리 생성. 빈 set이 아님
+
+set은 인덱싱을 통한 개별값 조회 불가능.
+반대개념은 subscriptable type임.
+
+*에러들 정리해두는게 좋음
+
+중복 값으로 set을 만들면, 중복값은 제거된 set이 생성됨
+
+set에 add는 불변값만 추가 가능하고, update는 변하는 값도 추가 가능
+
+|, union 합집합
+&, difference 교집합
+-, intersection 차집합
+
+iterable
+
+빈 리스트 a = [ ]
+빈 딕셔너리 b = { }
+
+파이썬은 switch문이 없음
+for, do while문도 없음
+
+for in, while문으로 대체
+
+파이썬은 else if 대신 elif 존재
+
+if 0: ---> false
+0이 아니면 true
+
+컴프리헨션이 처리속도가 빠름
+for in 문 사이에 코드가 들어가면 컴프리헨션은 사용 불가.
+
