@@ -21,5 +21,5 @@ SELECT * FROM ECOLI_DATA;
 
 SELECT a.ID "자식", b.ID "부모" 
 	FROM ECOLI_DATA a
-    RIGHT JOIN ECOLI_DATA b ON b.id = a.parent_id
+    INNER JOIN ECOLI_DATA b ON a.id = b.parent_id
     ORDER BY b.id;

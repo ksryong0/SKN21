@@ -1,0 +1,6 @@
+# No module named '모듈이름' 에러 : 모듈이 없다는 뜻임. 설치해줘야됨.
+
+try, finally만 쓰는 경우가 있음. exception 처리는 하지 않고, finally로 넘어가겠다.
+
+cursor생성과 close는 with 블록으로 실행. 무조건 하는거니까.
+
