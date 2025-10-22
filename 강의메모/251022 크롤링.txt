@@ -4,3 +4,42 @@ try, finally만 쓰는 경우가 있음. exception 처리는 하지 않고, fina
 
 cursor생성과 close는 with 블록으로 실행. 무조건 하는거니까.
 
+스크랩핑: 한개의 웹 페이지
+크롤링: 여러 웹 페이지
+
+requests를 통해서 가져온 html파일을
+BeautifulSoup 으로 읽어들일 것.
+
+Selenium : 웹사이트 테스트. 스크롤 자동으로 내리기, 버튼 클릭, 입력 하고 전송 등을 자동으로 해줌. 코드에 맞춰서. 
+
+AI Hub:파일이 크고, 이미지 음성 데이터가 많음
+
+GET : 서버한테 데이터를 달라고 하는거
+POST : 파일 업로드, 게시판에 글쓰기
+
+포트번호는 생략. 요청파라미터는 이름=value로 쓰고 여러개면 &로 구분
+https://IP(:포트번호)/경로?요청파라미터
+https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=%EB%84%A4%EC%9D%B4%EB%B2%84&ackey=hgc81nh4
+
+파라미터 지워보고 실행해보고 해서, 뭐가 뭔지 알아야됨.  필요없는거 날리기.
+
+HTTP 응답 상태코드
+에러 : 400번대
+서버 에러 : 500번대
+
+navigator.userAgent : 
+
+#text > p:nth-child(2) > span:nth-child(1)
+#text > p:nth-child(2) > span:nth-child(2)
+
+#\:Rl1d\:-list-view-node-\:R4vl1d\: > div.MainContent-module__container--NyRpm > div > div > div.Description-module__container--Zwqe8 > span
+#\:Rl1d\:-list-view-node-\:R4nl1d\: > div.MainContent-module__container--NyRpm > div > div > div.Description-module__container--Zwqe8 > span
+친환경차 혜택 정보 통합 플랫폼
+전기차 인프라 정보 제공 시스템
+타이어 매장 예비 점주를 위한 정보 제공 플랫폼
+[전기차 화재사고]
+자동차 등록 데이터 기반 신차 비교·추천 플랫폼
+중고차 구매 고려 고객을 위한 정보 제공 서비스
+캠핑카 등록현황 및 정보제공시스템
+차량 등록 현황 데이터를 이용한 대표 기업 선정과 판매량 기준으로 차량 추천
+전국 자동차 등록 및 현대자동차 판매 분석
