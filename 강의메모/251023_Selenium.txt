@@ -1,0 +1,57 @@
+셀레니움 단점:속도가 느림
+
+브라우저 헤드리스 모드:브라우저 안띄우고 테스트.
+
+명령어가
+1. 브라우저 켜라
+2. 두배 만들어라
+
+브라우저 켜라가 다 실행되기 전에 두배 만들어라 가 실행되면 에러.
+
+time함수로 쓰면, 쓸데없이 기다려야 되는 경우가 생김.
+time함수는 사람인 척 할 때 씀.
+
+셀레늄에서는 명시적 대기, 암시적 대기 두가지 제공.
+
+SELECT * FROM (SELECT * FROM charging_station WHERE objt_id IN (SELECT min(c1.objt_id) FROM charging_station c1 INNER JOIN charging_station c2 USING(x,y) group by x, y)) as c3 JOIN (SELECT parkinglot_id, count(objt_id) as "주차장별_충전소_갯수" FROM elecar_parking.charging_station GROUP BY parkinglot_id) as c4 USING(parkinglot_id);
+
+시 이름
+군 이름
+
+특별시
+세종특별자치시
+
+도, 특별시, 광역시, 특별자치시, 특별자치도
+
+
+공통
+주차장이름		STAT_NM
+주소			ADRES
+충전기 갯수	
+
+24시간여부		is_24h
+공영주차장 여부	STAT_NM에 공영주차장이 포함되는지
+
+공통입력
+주소 입력시 ADRES에서 지역명 글자 있는 주소 읽어오기
+
+체크했을때,
+1.  24시간 여부		is_24h
+2. 공영주차장 여부	
+
+케이스
+1. X X
+
+
+
+2. X 0
+
+
+
+3. 0 X
+
+
+4. 0 0
+
+
+
