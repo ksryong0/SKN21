@@ -16,12 +16,10 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 uv venv --python 버전명 : 이 버전으로 파이썬 가상환경 생성해줘.
 ex)uv venv --python 3.10
 uv pip install ipykernel
-
-
-uv venv --python 3.13 (터미널에 python --version을 입력했을 때, 3.10버전인 경우)
+ 
 Control shift p(명령 팔레트)->python select interpretor 선택->04_pandas를 이용한 정형데이터 다루기(Python 3.13.7) 선택
 
-\.venv\scrips\activate : 가상환경 실행
+.venv\Scripts\activate.bat : 가상환경 실행
 
 uv pip install pandas : uv로 판다스 설치
 

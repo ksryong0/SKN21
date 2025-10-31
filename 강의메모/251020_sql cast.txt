@@ -41,3 +41,13 @@ SELECT emp_id, emp_name, salary
 select 문에서 date_format(hire_date, '%Y년 %m월 %d일')
 이렇게 하면 yy년 mm월 dd일로 표기됨.
 
+---------------------
+https://school.programmers.co.kr/learn/courses/30/lessons/293259
+
+답
+SELECT round(avg(if(length>10, length, 10)), 2) AVERAGE_LENGTH
+    FROM FISH_INFO;
+
+SELECT if(length>10, length, 10) FROM FISH_INFO; -- if 조건에서 거짓이면 값이 null인 경우도 포함. 결과 26.666666666
+SELECT if(length<=10, 10, length) FROM FISH_INFO; -- if 조건에서 참인 경우에는 null은 미포함. 참 거짓 둘다 NULL은 미포함. 결과 35인가	
+
