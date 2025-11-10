@@ -1,0 +1,48 @@
+모델->학습(일반적 특성을 학습해야함)
+과적합:trainset에 대해
+	과대적합(over fitting):
+	1. validationset에서 성능이 낮음.
+	2. trainset은 성능이 좋음
+	이상치를 학습했다. 일반화가 떨어짐.
+	예)개 색이 분홍,녹색을 학습해버림. trainset은 좋고, validset은 성능이 안좋음. 존재하지 않으니까.
+	모델의 복잡도가 높다.
+	
+
+	과소적합(under fitting)
+	1. validationset에서 성능이 낮음.
+	2. trainset에서도 성능이 낮음.
+	모델의 복잡도가 낮다.
+
+모델 복잡도에 따른 성능 변화
+모델이 복잡해지면 점점 training error은 좋아지고 test error는 나빠짐.
+train과 valid 차이가 벌어질수록 더 overfitting임.
+--------------
+구글에서
+graphviz 검색(erd그릴때 쓰는 라이브러리)
+https://graphviz.org/
+다운로드 클릭
+오른쪽 사이드바에서 windows 클릭
+64bit exe installer 클릭
+설치
+다음
+동의
+add ~path for all users
+다음 쭉.
+
+cmd에서 관리자모드로 실행
+dot -c 입력후, 엔터(뭐 안나오고 넘어가지면됨)
+
+파이썬 다시 와서
+!uv pip install graphviz
+----------------------
+기본적으로는 validation이 좋은걸 씀
+valid가 높은값으로 일정하면 test랑 간격이 적은 것을 씀.
+
+하이터파라미터:
+max_depth
+max_leaf_nodes
+min_samples_leaf
+
+refit:뭐로 평가를 할지. 어떤 방식으로 평가할지
+
+n_jobs:보통 -1.
