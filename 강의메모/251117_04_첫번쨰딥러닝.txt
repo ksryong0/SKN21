@@ -1,0 +1,30 @@
+torch
+영상 torchvision
+음성 torchaudio
+자연어 torchtext
+
+1 step : 파라미터 한번 업데이트
+10 step -> trainset 한번 학습 -> 1epoch
+1 epoch당 step수는 다를 수 있음.
+메모리의 한계 때문에 스텝을 모아서 올림.
+
+raw data(MNIST_down받은거)		
+60,000					train data set은 raw data에서 요청한 데이터를 받아서 출력해주는 거임.
+
+raw data->data set(데이터를 하나씩 주는애) -> dataloader(데이터를 묶어서 주는애)
+-----------------
+loss가 좋은애가 accuracy가 좋은애보다 낫다.
+
+저장방법
+모델 자체를 저장
+파라미터들만 저장
+
+------------------------강사님 강조하신 중요 사항!!!--------------------------
+
+Dataset 생성(데이터셋 가져오는거)
+DataLoader 생성
+모델정의
+모델객체, 손실함수, Optimizer 객체 생성
+학습
+최종 평가
+--------------------------------------------------------
