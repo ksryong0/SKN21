@@ -1,0 +1,2 @@
+워크벤치
+에디트->프리퍼런스->sql editor->safe updates 체크 해제

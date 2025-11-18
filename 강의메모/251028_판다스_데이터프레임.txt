@@ -1,0 +1,44 @@
+데이터프레임의 각 행과 열들은 각각의 시리즈이다.
+
+csv 기본형식
+쉼표로 열 구분.
+엔터로 행 구분.
+
+csv를 많이 쓰는 이유 : 텍스트 포맷이라서.
+
+,id,korean,english
+0,id-1,100,90
+1,id-2,50,80
+2,id-3,70,100
+3,id-4,60,100
+4,id-5,90,40
+
+첫번째 열의 값이 인덱스 이름.
+,id,korean,english : 컬럼명들
+
+인덱스 이름이 따로 없으면 0,1,2,3,4 가 빠짐
+인덱스 이름을 따로 지정하지 않을거면 index=false로 지정해서 인덱스 이름을 뺴고 저장하게 하는것이 좋음. 읽을 때, 0,1,2,3,4 도 데이터로 읽어들이기 때문.
+
+!uv pip install openpyxl
+
+!uv pip install lxml
+
+주피터 노트북에서 터미널 명령어 실행시키고 싶을 때 '!' 를 붙임
+
+set_index : 컬럼을 인덱스 이름으로 만들어주는거
+reset_index : 삭제시?
+
+d.colums = []
+d.index = []
+d.rename = 
+d
+
+select_dtypes
+include, exclude 동시에 못씀
+
+filter도 items, like, regex중에 하나만 골라서 사용
+
+DF.loc[start index이름 : end index이름: step] : end index까지 포함!
+
+데이터프레임에서 lic인덱스는 끝 인덱스를 포함하지만
+iloc인덱스는 끝 인덱스를 포함하지 않고 그 전까지임.

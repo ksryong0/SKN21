@@ -1,0 +1,31 @@
+label 인코딩
+
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+
+# LabelEncoder의 instance 생성
+le = LabelEncoder()
+
+# 학습: 각 고유값들을 어떤 정수로 바꿀지 계산.
+le.fit(['TV', '냉장고', '컴퓨터', '에어콘', '공기 청정기', '정수기'])  # 인코딩 대상을 넣어 학습한다.
+
+# 변환: 학습 결과에 맞춰서 값들을 변환
+result1 = le.transform(items)
+print(result1)
+
+원핫
+
+import numpy as np
+# 원핫 인코딩은 열 단위로 처리하므로 2차원 형태의 자료구조를 입력한다.
+items=np.array([['TV'],['냉장고'],['전자렌지'],['컴퓨터'],['선풍기'],['선풍기'],['믹서'],['믹서']])
+print(np.shape(items)) # items.shape
+items  
+
+from sklearn.preprocessing import OneHotEncoder
+# 객체 생성
+ohe = OneHotEncoder()
+# 학습 - 어떻게 바꿀지 학습.
+ohe.fit(items)
+# 변환
+result = ohe.transform(items)
+# ohe.fit_transform(items) #fit과 transform을 한방에

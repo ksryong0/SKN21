@@ -1,0 +1,53 @@
+CAST('03-06-17' AS DATE)
+문자열을 DATE(날짜) 타입으로 형변환
+
+insert->create
+select->read, retreve
+update->update
+delete->delete
+
+CRUD : 위 앞글자씩 따서, CRUD라고 함. 데이터 관리
+
+날짜는 보통 / 가 아니고 - 로 구분
+날짜 한칸뛰고 시간
+'2025-10-20 09:29:00'
+
+워크벤치에서 컨트롤 엔터 눌렀을 때, 세미콜론 단위로 실행하므로 꼭 잘 써야함.
+
+NULL인 데이터를 WHERE절에서 쓸 때는 '= NULL' 이 아니고 'IS NULL'로 써야함!
+NULL이 아닌 데이터를 WHERE절에서 조회할 때는 'IS NOT NULL' 로 써야함.
+
+같지 않다는 != 또는 <> 로 사용가능.
+
+UPPER(컬럼명) 을 하면 결과값을 대문자로 바꿔줌
+피연산자가 null인 경우 결과는 null. ex)1+2+3+NULL 하면 결과는 NULL 이다.
+같은 컬럼을 여러번 조회할 수 있다.
+
+AND랑 OR가 같이 있으면 연산자 우선순위가 AND가 우선임. 무조건 AND 먼저함.
+-----------------------
+컬럼의 이름 대신에 컬럼의 순번(SELECT에서 조회할 컬럼의 순번)으로 ORDER BY 가능
+
+밑에 두개는 같은 코드임
+SELECT emp_id, emp_name, salary
+	FROM emp
+    WHERE salary >= 5000
+    ORDER BY salary DESC;
+
+SELECT emp_id, emp_name, salary
+	FROM emp
+    WHERE salary >= 5000
+    ORDER BY 3 DESC;
+----------------------
+select 문에서 date_format(hire_date, '%Y년 %m월 %d일')
+이렇게 하면 yy년 mm월 dd일로 표기됨.
+
+---------------------
+https://school.programmers.co.kr/learn/courses/30/lessons/293259
+
+답
+SELECT round(avg(if(length>10, length, 10)), 2) AVERAGE_LENGTH
+    FROM FISH_INFO;
+
+SELECT if(length>10, length, 10) FROM FISH_INFO; -- if 조건에서 거짓이면 값이 null인 경우도 포함. 결과 26.666666666
+SELECT if(length<=10, 10, length) FROM FISH_INFO; -- if 조건에서 참인 경우에는 null은 미포함. 참 거짓 둘다 NULL은 미포함. 결과 35인가	
+

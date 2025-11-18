@@ -1,0 +1,20 @@
+Dataset 생성
+DataLoader 생성
+모델 정의
+모델객체, 손실함수, Optimizer 객체 생성
+학습
+최종 평가
+
+학습할때랑 추론할 때 다르게 일을 해야 되는 애들이 있다.
+
+어제한거
+--------------------
+이름에 Network가 들어가는 이유 : 연결한다는 뜻. 결국엔 함수임.
+
+DNN(Deep Nearal Network). Feed Forward Network라고도 함. ANN(Artificial NN)라고도 함.
+
+CNN(Convolutional NN)
+RNN(Recurrent NN)
+Transformer
+
+unit : wx+b에서 출력된 값
