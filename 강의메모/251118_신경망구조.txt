@@ -18,3 +18,5 @@ RNN(Recurrent NN)
 Transformer
 
 unit : wx+b에서 출력된 값
+
+Hidden Layer : 
