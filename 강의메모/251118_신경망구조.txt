@@ -20,3 +20,21 @@ Transformer
 unit : wx+b에서 출력된 값
 
 Hidden Layer : 
+
+xw+b를 계산하는 방식의 차이들. 다 가중합 계산
+Fully Connected Layer : feature수에 따라 weight가 각각 있음. w1x1+w2x2+...+b
+계산을 연결이라고 함.
+Convolution Layer : w1 w2 w3 이렇게 몇개만 만들고 슬라이딩윈도우 방식으로 x를 이동시키면서 계산.
+Recurrent Layer : w는 하나. x1w 를 계산해서, 두번째 x2w 계산시에 앞에서 계산한 걸 이용함.
+x1*w+w*h1
+h1(이전처리 결과. x1w)
+x2w+wbh2
+(h2=x1*w+w*h1)
+어제의 처리결과도 같이 넣어서 순차적으로 계산.
+Embedding Layer : wx+b 하는데, 학생이라는 단어를 n차원 벡터로 바꿈. 자연어를 숫자로 바꿔줌.
+ReLu : activation함수. 활성함수. 뭔가 활성화시키는 함수는 아님. 
+
+선형성만 있으면 레이어를 나눌 필요가 없음. 레이어를 나누려면 비선형적 특성이 있어야됨.
+y^=xw1w2w3...
+=xW
+
