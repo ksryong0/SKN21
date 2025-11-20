@@ -1,2 +1,18 @@
 state_dict : 
------------------
+epoch를 많이한다. 같은데이터를 여러번 학습한다. epoch을 늘리면 train은 점점 좋아지는데 valid는 좋아지다가 어느순간 나빠짐.
+100에폭이면 50에서 저장을 해둠. 최소값을 저장?
+최소값 나오고, 다시 안좋아지는게 몇 에폭동안 지속되면 조기종료시킴.
+
+----------------
+CrossEntorpyLoss를 가장 많이 사용
+
+for epoch in range(epoch)
+
+전용25
+공급33
+
+수원시청역 SK뷰(SKVIEW)
+전 집주인 이사 완료 후, 당일 오후안에 완료
+전용면적 25평
+
+class DropOutModel(nn.Module):
