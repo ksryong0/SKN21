@@ -1,0 +1,70 @@
+메모장이나 편집화면으로 볼 것!
+
+1. 로지스틱 리그레션
+test
+정확도: 0.858603066439523
+재현율: 0.6873661670235546
+정밀도: 0.7570754716981132
+F1 점수: 0.7205387205387206
+Average Precision: 0.826315880600229
+ROC-AUC Score: 0.9281265203591605
+
+Important Feature
+numTechTickets
+Contract_Month-to-month
+InternetService_Fiber optic
+2. 랜덤포레스트
+test
+정확도: 0.8512208972174901
+재현율: 0.6488222698072805
+정밀도: 0.7556109725685786
+F1 점수: 0.6981566820276498
+Average Precision: 0.8045045641071308
+ROC-AUC Score: 0.9169226110296576
+
+Important Feature
+numTechTickets
+tenure
+TotalCharges
+
+3.디시전 트리
+test
+정확도: 0.8438387279954571
+재현율: 0.6702355460385439
+정밀도: 0.7211981566820277
+F1 점수: 0.6947835738068813
+Average Precision: 0.7058679689890119
+ROC-AUC Score: 0.8710636143094963
+
+Important Feature
+Contract_Month-to-month
+numTechTickets
+tenure
+
+4.SVM
+test
+정확도: 0.8642816581487791
+재현율: 0.69593147751606
+정밀도: 0.7701421800947867
+F1 점수: 0.7311586051743532
+Average Precision: 0.8301595390922609
+ROC-AUC Score: 0.9259587157329663
+
+Important Feature
+numTechTickets
+tenure
+TotalCharges
+
+5. XGboost
+test
+정확도: 0.8625780806360023
+재현율: 0.6809421841541756
+정밀도: 0.7737226277372263
+F1 점수: 0.724373576309795
+Average Precision: 0.8349934459151099
+ROC-AUC Score: 0.9320136753720847
+
+Important Feature
+Contract_Month-to-month
+InternetService_Fiber optic
+OnlineSecurity_No
