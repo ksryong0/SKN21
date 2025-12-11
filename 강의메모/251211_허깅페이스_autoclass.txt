@@ -1,0 +1,4 @@
+파이프라인 모델에 모델아이디 등록. 태스크만 다르게 설정.
+폴더 생성:ko_en_translator
+uv pip install streamlit
+
