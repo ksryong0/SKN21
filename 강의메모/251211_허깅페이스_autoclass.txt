@@ -2,3 +2,46 @@
 폴더 생성:ko_en_translator
 uv pip install streamlit
 
+오토클래스
+오토모델
+오토토크나이저
+오토컨피그
+
+for X,y in dataloader:
+
+p(X)
+loss_fn(p(x),y)
+
+Dataset 라이브러리:허깅페이스 모델에 넣을 수 있는 형태로 만들어줌. 또는 허깅페이스에서 다운받아옴.
+받아온 데이터는 전처리도 필요. 전처리 관련 함수들도 제공.
+자료구조라고 생각하면 됨. 
+데이터셋딕트 : 데이터셋과 관련있는 딕셔너리
+
+Automodelforxxxx("F.E모델")
+
+FE.모델     추론기가 없음. 랜덤하게 초기화된 추론기를 넣어줌.
+
+파인튜닝을 down-stream task 라고도 함.
+
+Collator?
+DataLoader : batch 단위로 묶어주기. Dataset이랑 연결해서 이용.
+Dataset : raw데이터에서 데이터를 1개씩 load.
+전처리시 데이터로더에서 batch 묶어주기.
+callator 가 데이터로더에서 batch_size만큼 가져온 데이터들을 모델이 읽어옴.
+callator(개별데이터): 전처리한 결과를 리턴
+raw data에서 미리 전처리하는게 좋음.
+sampler
+패딩처리는 미리 전처리를 못함.
+
+현재 데이터셋-패딩처리 X, trancation 처리 X.
+정적패딩 - max-length를 정적으로 맞춤. 내 전체 데이터셋의 사이즈를 통일하겠다. 토크나이징 할 때 해버림.
+동적패딩 - batch 단위로 길이를 맞춰주자. 제일 긴거에 맞춤. 메모리 절약. 속도 증가. 효율적.
+
+라벨 패딩 : 정답에는 -100을 넣음. 
+
+DataCollatorFOrLanguageModeling:랜덤하게 마스크로 가려서 학습시킴. MLM(마스크드 랭기지 모델).
+DataCollatorForSeq2Seq : 입력/출력 둘다 패딩
+DataCollatorFortokenClassification:토큰 레벨 라벨 패딩
+DefaultDataCollator:기본
+
+
