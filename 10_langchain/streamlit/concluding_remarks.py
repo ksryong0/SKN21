@@ -50,28 +50,76 @@
 ##################################################################
 import streamlit as st
 import random
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import ChatOpenAI
+from dotenv import load_dotenv
+load_dotenv()
 
-idx = random.randint(0, 9)
-chatbot_message_list = ["오늘 날씨가 어떤가요?",
-"점심으로 뭘 먹으면 좋을까요?",
-"집에서 할 수 있는 간단한 운동은 뭐가 있나요?",
-"요즘 인기 있는 드라마 추천해 줄 수 있나요?",
-"효과적으로 공부하려면 어떻게 해야 하나요?",
-"주말에 어디로 놀러 가면 좋을까요?",
-"잠이 안 올 때는 어떻게 하면 좋을까요?",
-"효율적으로 정리정돈을 하려면 뭐부터 해야 하나요?",
-"건강에 좋은 간식으로는 어떤 게 있나요?",
-"스트레스를 푸는 좋은 방법이 있을까요?"]
+# 대화 기록을 저장할 히스토리 클래스 불러오기
+chat_history = ChatMessageHistory()
 
-ai_message = chatbot_message_list[idx] # AI의 답변
+chat = ChatOpenAI(model="gpt-4o")
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """당신은 끝말잇기 게임을 진행하는 AI 챗봇입니다. 아래는 게임 규칙입니다. 당신과 user 의 입력에서 아래 규칙이 꼭 지켜져야 하며, 지키지 않은 사람에게 패배를 알린 뒤, 끝말잇기 게임을 종료합니다.
+                1. 주어진 대화 기록에서 이미 나왔던 단어를 다시 말했을 경우 패배합니다.
+                2. 두음법칙을 허용합니다. (ex. 리 -> 이, 력 -> 역, 락 -> 낙)
+                3. 국어사전에 존재하는 단어이자, 명사여야 합니다.
+            """,
+        ),
+        ("placeholder", "{chat_history}"),
+        ("user", "{input}"),
+    ]
+)
+
+chain = prompt | chat
+
+chain_with_message_history = RunnableWithMessageHistory(
+    chain,
+    lambda session_id: chat_history,
+    input_messages_key="input",
+    history_messages_key="chat_history",
+)
+
+# chat_history.messages
+def summarize_messages(chain_input):
+    stored_messages = chat_history.messages
+    if len(stored_messages) == 0:
+        return False
+    summarization_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("placeholder", "{chat_history}"),
+            (
+                "user",
+                "위 채팅 메시지는 끝말잇기 게임을 진행한 대화내용입니다. 언급한 단어들만 나열하여 저장해주세요.",
+            ),
+        ]
+    )
+    summarization_chain = summarization_prompt | chat
+    # chat_history 에 저장된 대화 기록을 요약프롬프트에 입력 & 결과 저장
+    summary_message = summarization_chain.invoke({"chat_history": stored_messages})
+    # chat_history 에 저장되어있던 기록 지우기
+    chat_history.clear()
+    # 생성된 새로운 요약내용으로 기록 채우기
+    chat_history.add_message(summary_message)
+    return True
+
+
+chain_with_summarization = (
+    RunnablePassthrough.assign(messages_summarized=summarize_messages)
+    | chain_with_message_history
+)
 
 # 대화 내역을 저장할 session state 를 생성
 if "chat_history" not in st.session_state:
     st.session_state['chat_history'] = []
 
 st.title("Chatbot 위젯 튜토리얼")
-
-# User input을 입력받는 chat_input 정의
 prompt = st.chat_input("User:")
 
 if prompt: # 글이 입력되었다면 prompt와 ai 응답을 화면에 출력
@@ -82,17 +130,15 @@ if prompt: # 글이 입력되었다면 prompt와 ai 응답을 화면에 출력
         {"role":"user", "content":prompt}
     )
     # AI 응답을 추가
+    ai_message = chain_with_summarization.invoke(
+        {"input": prompt},
+        {"configurable": {"session_id": "unused"}}
+    )
     st.session_state['chat_history'].append(
-        {"role":"ai", "content": ai_message}
-    )  
+        {"role":"ai", "content": ai_message.content}
+    )
 
-    with st.chat_message("User"): # role은 필수적으로 줘야됨.
-        st.write(prompt)
-
-    with st.chat_message("ai"):
-        st.write(ai_message)
-
-    # 대화내역 출력 - chat_history의 모든 내역을 출력
+# 대화내역 출력 - chat_history의 모든 내역을 출력
 for chat_dict in st.session_state['chat_history']:
     with st.chat_message(chat_dict['role']):
         st.write(chat_dict["content"])
