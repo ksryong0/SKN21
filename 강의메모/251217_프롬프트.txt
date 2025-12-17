@@ -37,4 +37,58 @@ Base64
 
 ChatPromptTemplate을 이용한 멀티모달 Prompt 정의
 
+LLM으로부터 답변을 잘 받기위한 프롬프트를 만들어내는거:프롬프트 엔지니어링
+프롬프트템플릿:같은 틀 안에서 일부값만 바꿔서 질문할 때 쓰는거.
+ChatXXXX : XXXX 모델한테 요청하는거.
+	invoke 메소드 호출하고 쿼리 넣어주면 요청.
+invoke하면 답변이 나옴.
 
+prompt 	-> model 			-> 응답
+P.T		ChatOpenAI등등		Output Parser
+
+다양한 타입의 output parser가 있다. 모델의 응답 객체를 원하는 형태로 값을 뽑아주는 애.
+모델의 응답을 딕셔너리로 뽑아내고 싶을 때:아웃 파서가 해줌.
+
+1. 요청시 형태를 지정. 너 응답할 때 이렇게 응답해.
+2. 응답 받은거를 변환.
+
+1. CommaSeparatedListOutputParser
+콤마로 들어온거 리스트로 반환
+2. JsonOutputParser
+JSON(딕셔너리를 문자열로 표현한 거)형태로 출력.
+3. PydanticOutputParser
+json을 Pydantic 모델로 변환
+
+주요메소드
+parse
+get_format_instructions
+
+JsonOutputParser
+딕셔너리 같음.
+데이터 교환할 때 많이씀.
+
+스키마:응답에 대한 설계도
+뭐뭐만 줘
+
+PydanticOutputParser는 데이터 객체로 바꿔줌. 값 조회시 .값이름 으로 조회.
+JsonOutputParser는 JSON으로 출력해줌. 값 조회시 대괄호 표기법.
+
+동적타입언어 장점 : 융통성이 있다. 막 바꿀수 있다.
+단점 : 프로그램이 불안정하다. 지금 무슨 타입인지 알수가 없다.
+
+변수명:타입
+
+def 이름(a:int, b:str) -> int:
+변수명에 타입.
+-> 후에는 리턴타입.
+
+Union:두 타입중 아무거나 상관없음
+Union이 | 연산자로 바뀜
+
+dataclass는 validation이 안됨
+
+Pydantic:유효성검사, 형변환, 필드(인스턴스 변수)의 기본값 지원, 데이터 직렬화 및 역직렬화(json 변환, 역변환). validation도 해줌.
+Field는 검증의 역할이 더 큰 목적임. 파이썬에서의 타입 약점을 해결하기 위함.
+
+invoke는 답변이 한번에 쫙 나옴.
+Streaming 방식은 토큰 단위로 옴.
