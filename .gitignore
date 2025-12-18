@@ -5,3 +5,5 @@
 09_Huggingface_transformers/data/
 10_langchain/.env
 10_langchain/streamlit/.env
+*.env
+*.sqlite

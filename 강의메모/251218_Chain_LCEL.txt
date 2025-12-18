@@ -1,0 +1,90 @@
+아웃풋 파서:LLM의 응답을 원하는 형태로 바꿔주는거.
+StrOutputParser:그냥 문자열로 뽑아줌. Content에 담겨있던거 벗겨냄.
+
+get_format_instrunctions?
+
+partial_variables:placeholder에 어떤 타입의 무엇을 넣을지 아직 모를때.
+
+Field
+description 설명
+값 타입
+                       인스트럭션
+프롬프트->모델->파서->결과
+체인:모델에 스키마를 병합해서 하나의 구조로 만듬
+gpt 자체가 답변을 한 토큰씩 만듬.
+
+모델.stream 방식
+토큰단위로 답변이 오니까 사용자가 빨리 답변을 받는 것처럼 느껴짐.
+
+
+-----------------------여기까지 복습----------------
+
+체인:입출력 단계를 묶어서 파이프라인처럼 한번에 처리.
+프롬프트 모델 파서 를 체인으로 묶어서 질문을 프롬프트에 넣어주면 결과가 나옴.
+
+장점:각 구성 요소들을 변경하기 쉬워짐. 모델이나 파서나 바꿔야될 때, 바꾸기가 쉬움. 다양한 모델들과 파서들을 사용할 수 있음.
+
+LCEL 표현식:체인을 구성하는 방법
+1.off-the-shelf
+클래스를 다 만들어줌.
+2.LCEL
+작업흐름이 명확해짐. 재사용성 높아짐.
+간결하다!
+
+러너블 타입은 LCEL의 구성요소로 다 들어갈 수 있다.
+
+assign:뭘 더 추가할때. 자주 씀.
+
+러너블의 주요 구현체
+LCEL의 다양한 작업들을 도와줌.
+
+러너블시퀀스:체인을 만듬. 잘 안씀.
+RunnablePassthrough
+
+RunnableLambda
+함수를 체인구조안에 넣어주고 싶을 때 사용.
+@chain 으로 만들수도 있음.
+
+LCEL에 함수를 붙여줄 떄, 람다식을 붙여주고 싶으면 RunnableLambda 에 넣음. 함수가 있으면, 굳이 RunnableLambda를 쓸 필요는 없고, 함수 자체를 붙여주면 됨.
+
+RunnablePassThrough?
+딕셔너리가 전달됐을 때, 
+1. 그대로 딕셔너리로 전달. 통과. 그럼 어따쓰지? 러너블 패러럴하고 같이 씀.
+2. 그냥 통과시키지 않고, 값을 추가시켜서 다음으로 보내주는 경우도 사용.
+assign함수. assign(키=밸류, 키2=밸류2)
+
+앞에서 받은 값은 어쨋든 다음으로 전달.
+
+----------------------------이 패턴이 중요---------------------
+
+# 입력받은 값에 field를 추가해서 전달. 입력: dict, item을 추가해서 전달
+
+address_runnable = RunnableLambda(lambda x: "서울시 금천구")
+phone_runnable = RunnableLambda(lambda x: "010-1234-5678")
+
+
+rp2 = RunnablePassthrough.assign(
+    address=address_runnable, phone=phone_runnable
+    #변수=Runnable(Callable) key:변수-Value:Runnable 반환값을 input dict에 추가.s
+)
+res = rp2.invoke({"name":"홍길동"})
+res
+-------------------------------------------------------------------
+
+RunnableParallel
+병렬.
+
+딕셔너리로 구현해버림.
+결과도 딕셔너리로 나옴.
+
+itemgetter 중요한듯.
+
+LCEL은 sequential한 흐름만 처리 가능.
+
+체인끼리 합치다보면 어떤건 쓰고 어떤건 안쓰고 그래야 될 때가 있음. 제어는 안됨.
+제어하려면 함수에 넣어야됨.
+
+Langgraph:제어, 조건문을 적용할 수 있음.
+랭체인에서 랭그래프로 넘어옴.
+
+
