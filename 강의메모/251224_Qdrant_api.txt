@@ -1,0 +1,143 @@
+임베딩벡터:인덱스, 문서내용, metadata
+인덱스만으로 검색하는건 한계가 있어서 metadata로 먼저 조회.
+
+자연어->모델->임베딩벡터
+	            피쳐 벡터:특징, 숫자
+
+자연어 -> FE 분류기 ->분류
+             예측-정답
+
+1. 유사도:두 문서의 유사도를 잘 검색하고 학습할수 있는 FE를 써야됨.
+2. 다국어 지원
+
+임베딩모델은 openai가 가장 좋지는 않음.
+llm하고 임베딩모델은 관련이 없음.
+
+코사인 유사도
+
+벡터데이터베이스 : 비정형 데이터를 벡터로 변환하여 저장
+KNN:코사인유사도가 높은순으로 정렬
+
+벡터스토어.add_document(documents=[d1,d2,d3]) # embedding_vector와 문서를 묶어줌.
+서치_with_score:유사도 결과 및 점수까지 볼수있음
+
+--------------------- 복습 -------------------------
+
+크로마디비 많이씀:대용량에는 문제가 됨
+
+Qdrant
+Nearest Neighbor: Flat 알고리즘이라고 함. Flat알고리즘은 다 뒤져봄. 데이터량 많으면 시간이 많이걸림
+->HNSW 기반의 ANN 알고리즘: 속도 개선. 가장 많이 사용되는 알고리즘.
+파이썬,자바스크립트,러스트,자바 지원
+REST API 지원:웹의 http 프로토콜에 맞춰 응답 요청 가능
+스냅샷 및 영속성:db 백업
+오픈소스:아파치 라이선스. 막 가져다 쓸수있음. 단, qdrant라고 표시는 해야됨.
+
+WAL
+WAL : 하다가 실패한걸 가지고 있는 로그
+Snapshot : 백업
+WAL+Snapshot:데이터 무결성과 내구성
+
+----------여기부터 기억해야됨!!!!!! 강사님 강조---------------------------
+Collection: 데이터베이스라고 보면 됨. 데이터를 모을 때 가장 큰 단위. 벡터 디비라고 보면 됨.
+
+name:이름
+vectors.size:임베딩 벡터 차원수. 보통 같은 차원으로 임베딩 모델을 만듬. 설정하면 못바꿈
+vectors.distance:유사도 계산 방식(Cosine:방향기반, Dot, Euclidean:거리기반). 코사인이나 유클리디안 방식을 많이 씀.
+
+Point:개별데이터. 하나의 항목. 디비로보면 한 row.
+id:고유식별자. 안만들어도 자동으로 들어감.
+vector:임베딩된 벡터값. 인덱스로 사용됨.
+payload:메타데이터(json). 사람이 메타데이터는 만들어야됨.
+Document(metadata=)
+
+데이터를 넣는거:upsert
+
+카테고리 조건이 복잡시러움.
+같냐 : match
+
+user 의 age 가 30. nested.
+크다 작다 : range
+여기서 gte:grater than equal? 이상.
+
+uv pip install qdrant-client
+
+도커 이미지가 필요하면 Docker-hub에 가서 받아오면 됨.
+
+1. 이미지를 다운
+2. Container로 실행
+
+6333:6334
+바깥포트:안쪽포트
+포트 포워딩.
+
+volume?
+
+도커도 공부를 해야된다고 하심
+
+도커 데스크탑을 켠 후, cmd에서
+docker run -p 6333:6333 -p 6334:6334 -v "qdrant_storage:/qdrant/storage:z"  qdrant/qdrant
+
+크롬에서
+127.0.0.1:6333/dashboard
+접속
+
+도커 밖에 연결. qdrant/storage를 마운트. 도커에 문제가 생겨도 유지됨.
+
+필터링:정확도 향상. 속도 빨라짐. 불필요한거 줄여주니까.
+
+must:논리연산자 역할을 하는 변수
+조건들을 넣어줌.
+
+must = [
+조건1
+조건2
+]
+and 조건임.
+
+should:or 조건
+min_should : 조건 중 최소 k개 이상 만족.
+must_not: must의 반대. 아닌것들.
+
+match_text:와일드카드 문자열을 이용한 패턴 검색은 안됨.
+
+포맷
+key
+연산자들
+
+gte=ge
+lte=le
+
+나이
+30
+23
+80
+15
+16
+27
+5
+
+age>35면 다 조회해야함. 만약에 정렬이 되어있으면?
+5 15 16 23 27 30 80 이렇게 정렬되어있으면 찾기 쉬움.
+이게 index.
+인덱스
+A.나이->미리 정렬
+
+페이로드도 비슷.
+----------------------------
+이 문법 중요!!! 강사님 강조
+
+query_filter=Filter(
+        min_should=MinShould( # 조건들 중에 K개를 만족
+            # 다음 조건중 최소 2개가 True point들. 3개일땐 must쓰면됨. 1개면 should쓰면됨
+            min_count=2,
+            conditions=[
+                FieldCondition(key="country", match=MatchValue(value="USA")),
+                FieldCondition(key="city", match=MatchText(text="Be")),
+                FieldCondition(key="num", range=Range(lt=5000))
+            ]
+        ) 
+    )
+
+----------------------------
+
