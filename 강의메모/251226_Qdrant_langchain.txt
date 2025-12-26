@@ -1,0 +1,160 @@
+qdrant에서 클라우드 서비스도 지원. 요건 유료임.
+
+외부자원-1. 연결
+	    2. 통신
+            3. 연결 해제
+
+메모리와 연결. :memory:
+로컬 저장 : path=로컬저장소경로
+
+BoW방식으로 저장도 할 수 있음.
+
+BoW
+단어들 좍 놓고, 토큰 몇개씩 나왔는지
+
+컨텐츠->임베딩모델->임베딩벡터(벡터디비에서 인덱스로 사용)
+
+쿼리 필터
+
+페이로드인덱스(create_payload_index 메서드):필터의 조건을 빠르게 해줌. 속도 차이에 영향을 크게 줌.
+
+set_payload
+overwrite_payload
+delete_payload
+clear_payload
+
+-----------------복습-------------------------
+
+Langchain - VectorDB
+              CRUD
+
+랭체인은 prompt, LLM, vectordb, output parser 등등을 지원.
+
+Qdrant는 아래 두가지 방식 둘다 지원함. hybrid search 가능. 의미기반+키워드기반 검색 가능.
+1. dense vector(의미기반검색) 저장소를 만들수 있음
+2. sparse vector(키워드기반검색) 저장소도 만들수 있음.
+
+키워드기반->TF-IDF 방식 플러스알파. BM25방식
+
+카운트기반. 비슷한 단어가 몇개가 나왔나 확인.
+ex)BoW. DTM 방식(단점:어떤 단어는 모든 문서에 많이나옴. 한글에서는 조사. 은,는,이,가)
+
+BM25방식
+1. 단어 출현 빈도(Term Frequency)
+TF(단어의 빈도수 점수)-IDF(전체 문서의 몇군데에서 나왔는지에 대한 패널티. 적게 나올수록 점수가 높음)
+ex)
+TF방식 -> 어떤 단어가 A문서 10, B문서 10.
+
+A는 100개문서중에 한개만 나옴.
+B는 100개문서중에 50개.
+그럼 A가 점수가 더 높음. IDF방식.
+
+BM25는 이 TF-IDF에 문서 길이에 대한 패널티도 추가. (문서 자체가 여러 단어로 구성되어있으면(길면) 패널티.)
+50단어로 구성된 문서. 단어가 1번 나옴
+5000단어로 구성된 문서. 단어가 50번 나옴
+50000단어로 구성된 문서. 단어가 500번 나옴
+
+TF:단어의 빈도수
+IDF:다른 문서의 빈도수에 반비례
+문서 길이:문서 자체의 길이에 반비례
+
+문서내에서 각 토큰의 점수를 계산.
+
+BM25는 내용적인거는 없음.
+문맥적인거는 dense vector로.
+그래서 두개를 합쳐서 함. 하이브리드 서치.
+
+Retriever?
+
+ParentDocumentRetriever
+질문과의 유사도를 맞춰주기 위해 청크를 짧게 짧게 자름.
+원래 큰 문서를 짧게 짧게 잘라서 청크 단위를 작게 나눔.
+그러고 metadata에 전체 문서를 contents로 붙임.
+질문의 길이와 context의 길이가 비슷해짐. 그러면 잘 찾을 수 있음.
+찾은 한줄의 문서를 전체 payload에 집어넣음.
+
+MultiVectorRetriever
+문서가 있으면 문서에 대해서 임베딩 벡터를 만듬. 그러고 질문이 들어오면 ev랑 찾았었음
+그러지말고
+문서 하나에대한 임베딩 벡터를 여러개 만들어둠.
+1. 문서를 요약
+2. 요약본의 임베딩벡터
+3. 가상의 질문을 만들어봄.
+4. 답변을 페이로드에 넣어둠.
+
+SelfQueryRetriever
+ㅍㅔ이로드에는
+임베딩 벡터로
+문서내용
+문서정보-주제, 소재, 일자, 작성자
+가 들어있음
+사용자 질문이 들어오면 질문에서 키워드를 추출함. 추출은 LLM이 함.
+페이로드에서도 필터링을 함.
+질문으로부터 키워드를 추출하여 처리
+
+ContextualComppressionRetriever
+핵심 정보를 압축. 이때 reranking 기법을 많이 쓴다.
+
+Multiquery
+질문을 여러개?
+
+Ensemble
+하이브리드 서치 같은거.
+
+Retriever 는 조회를 하는거긴 한데, 적용하는 시점이 3가지
+벡터DB를 구축할 때
+검색 시점에 적용
+검색 후에 적용
+------------------------------------------------------------------------------------
+##########################################중요########################################
+######################################################################################
+# Retriever를 포함한 전체 chain을 구성
+#
+# 쿼리 -> (retriever) -> 문서들/쿼리 -> (Prompt Template) -> prompt -> (llm) -> 응답
+######################################################################################
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+from langchain_core.output_parsers import StrOutputParser
+
+prompt = ChatPromptTemplate.from_template(
+    template="""# Instrunction
+당신은 정보제공을 목적으로하는 유능한 AI Assistant 입니다.
+주어진 context의 내용을 기반으로 질문에 답변을 합니다.
+Context에 질문에 대한 명확한 정보가 있는 경우 그것을 바탕으로 답변을 합니다.
+Context에 질문에 대한 명확한 정보가 없는 경우 "정보가 부족해 답을 할 수 없습니다."라고 답합니다.
+절대 추측이나 일반 상식을 바탕으로 답을 하거나 Context 없는 내용을 만들어서 답변해서는 안됩니다.
+
+# Context:
+{context}
+
+# 질문:
+{query}
+
+"""
+)
+
+retriever = vector_store.as_retriever(search_kwargs={"k":5})
+model = ChatOpenAI(model="gpt-5-mini")
+
+def format_str(docs:list) -> str:
+    """
+    docs: list[Document] - vector store 검색한 내용에서 page_content만 추출해서 반환하는 Runnable
+    """
+    return '\n\n'.join(doc.page_content for doc in docs)
+
+# 쿼리 -> (retriever) -> 문서들/쿼리 -> (Prompt Template) -> prompt -> (llm) -> 응답
+chain = {
+    "context":retriever | format_str, # retriever->format_str->context
+    "query":RunnablePassthrough() # 쿼리는 그대로 붙임.
+} | prompt | model | StrOutputParser()
+
+query = "올림픽에서 약물과 관련된 스캔들이 뭐가 있었지?"
+response = chain.invoke(query)
+
+print(response)
+
+----------------------------------------------------------------------------------------------------------------------
+주말에 RAG 부분은 복습이 필요하다고 강사님께서 강조하심!
+
+
