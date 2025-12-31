@@ -113,6 +113,10 @@ Tool-기능. 함수. LLM의 손발이 되어 작업을 수행해주는 애들.
 MCP도 하나의 툴임.
 
 
+!uv pip install langchain-tavily
+
+툴호출할떄 동적으로 넣어줄수 있음. args를 넣어도됨.
+그렇게 안하고 too calls에 있는 딕셔너리를 그대로넣고 invoke할 수 있음.
 
 
 

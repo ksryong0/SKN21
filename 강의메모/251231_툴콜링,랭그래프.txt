@@ -1,0 +1,51 @@
+Agent
+생각-행동(툴 콜링)-관찰 반복
+툴 : LLM이 호출할수 있는 함수. 
+1. 툴-함수
+2. 툴 바인딩
+사용할 함수에 대한 설명
+
+tavilysearch:빌트인 툴. 
+
+AI메세지->LLM 응답
+휴먼메세지->유저 질의
+시스템메세지->대화방향
+ToolMessage->Tool의 응답 메세지
+
+툴이 똑같으면 batch로 호출 가능.
+툴이 여러개면 반복문으로 호출해야함.
+
+중요한듯.
+툴메세지:툴의 처리 결과. 툴을 호출하라고해서 한거. 그래서 tool-calls정보가 있는 ai 메세지도 있어야 됨.
+---------------
+MCP
+클로드, 랭체인 등에서 다 쓸 수 있음.
+
+nodejs 검색->node.js 다운로드 클릭->윈도우설치프로그램(.msi)->Auto 뭐시기 체크하지말고->설치
+cmd->node -v 해서 버전 나오는지 확인. npm -v 도 확인.
+
+vs코드 껐다 키고
+!uv pip install langchain-mcp-adapters
+
+!uv pip install mcp_server_time
+
+client->연결
+       ->요청
+                   서버 -> 툴 실행
+          응답<-
+
+터미널가서 python -m mcp_server_time
+
+MultiServerMCPClient
+MCP서버에 연결된 툴 리스트를 가져옴.
+
+MultiServerMCPClient.get_tools : mcp툴을 랭체인에서 쓸 수 있음?
+
+비동기 A, B, C가 있으면
+A가 작업하다가 I/O 작업이 나오면
+B가 실행하고 B가 실행하다가 I/O작업이 나오면 다시 A로 와서 작업하고 등등..
+
+근데 async가 주피터랩에서 안돌아감.
+주피터 랩 자체가 비동기 처리.
+대기 상태를 주피터 랩이 씀.
+주피터랩이 비동기적 설정을 사용하기 때문에 우리가 비동기를 할수가 없음. 근데 nest_asyncio.apply()를 하면 됐었는데, 주피터랩 어떤 버전부터 안됨. 
