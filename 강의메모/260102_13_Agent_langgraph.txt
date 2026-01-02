@@ -3,14 +3,18 @@ MCP 구성요소
 클라이언트
 서버
 
+MCP서버가 제공
+도구
+리소스
+프롬프트
 
+mcp 서버가 툴들을 들고있는것.
 
-
-
-
-
-
-
-
+"/Users/username/Desktop"
+/path/to/other/allowed/dir
 
 --------------복습-----------
+
+mcp 코드(mcp_exam.py)는 도커 켜야 잘됨.
+
+
