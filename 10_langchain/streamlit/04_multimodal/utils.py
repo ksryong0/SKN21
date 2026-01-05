@@ -40,6 +40,7 @@ def get_human_message(text_message: str, bytes_data:bytes=None, mime_type=None, 
 
     from pprint import pprint
     print("get_human_message history added:", messages)
+   
     # 현재 사용자 입력 추가
     content=[
         {"type": "text", "text": text_message},
@@ -48,7 +49,8 @@ def get_human_message(text_message: str, bytes_data:bytes=None, mime_type=None, 
         d_type = "image" if "image" in mime_type else "file" # 이미지이면 "image" 아니면 file
         base64_data = base64.b64encode(bytes_data).decode("utf-8")
         content.append(
-            {"type": d_type, "source_type":"base64", "data": base64_data, "mime_type": mime_type, "filename": filename}
+            {"type": d_type, "source_type":"base64", "data": base64_data, 
+             "mime_type": mime_type, "filename": filename}
         )
     messages.append(HumanMessage(content=content))
     return messages

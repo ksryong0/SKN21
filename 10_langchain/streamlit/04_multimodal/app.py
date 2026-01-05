@@ -52,20 +52,21 @@ prompt = st.chat_input(
 # 사용자가 입력한 텍스트와 첨부파일 처리
 ###########################################
 if prompt:
-    text_prompt = prompt.text
-    attach_files = prompt.files
+    text_prompt = prompt.text  # 텍스트 입력
+    attach_files = prompt.files# 첨부파일: list
     mime_type=None
     bytes_data = None
     filename = None
 
     if attach_files:
         attach_file = attach_files[0]
-        bytes_data = attach_file.getvalue()
+        bytes_data = attach_file.getvalue() #bytes
         mime_type = utils.get_file_mimetype(bytes_data)
         filename = attach_file.name
         
-    messages = utils.get_human_message(text_prompt, bytes_data, mime_type, filename, st.session_state['message_list'])
-
+    messages = utils.get_human_message(text_prompt, bytes_data, mime_type, filename, 
+                                       st.session_state['message_list'])
+    
     st.session_state["message_list"].append({"role":"user", "message":text_prompt})
     
     with st.chat_message("user"):
