@@ -27,14 +27,16 @@ prompt = get_prompt_template()
 
 if "chat_history" not in st.session_state:
     st.session_state['chat_history'] = []
-    
+
 st.title("Chatbot Service")
 
-# 기존 메세지 먼저 출력
+######################################
+# 기존 대화내역 출력 
+# - session_state 저장된 대화내역을 chat_message()를 이용해 출력
+######################################
 for chat_dict in st.session_state['chat_history']:
     with st.chat_message(chat_dict['role']):
-        st.write(chat_dict["content"])
-
+        st.write(chat_dict['content'])
 
 user_input = st.chat_input("User:")
 
@@ -42,7 +44,7 @@ if user_input: # 사용자가 질문을 입력하면
     # 사용자 질문을 출력
     with st.chat_message("user"):
         st.write(user_input)
-    # PromptTemplate으로 쿼리를 생성
+    # PromptTemplate으로 쿼리 생성
     query = prompt.invoke({
         "query":user_input,
         "history":st.session_state['chat_history']
@@ -50,8 +52,9 @@ if user_input: # 사용자가 질문을 입력하면
     # llm에 요청 - stream()
     generator = model.stream(query)
     with st.chat_message("ai"):
-        # generator가 값을 제공하는데로 출력하고 최종결과를 반환
-        response = st.write_stream(generator) 
+        # generator가 값을 제공하는데로 출력하고 최종 출력한 내용을 반환
+        response = st.write_stream(generator)
+
     # 대화 내역을 session state에 저장.
     st.session_state['chat_history'].append(
         {"role":"user", "content":user_input}
@@ -59,6 +62,11 @@ if user_input: # 사용자가 질문을 입력하면
     st.session_state['chat_history'].append(
         {"role":"ai", "content":response}
     )
-# cd streamlit
-# ....\streamlit>
+
+
+
+
+
+# cd streamlit  
+#  .....\streamlit>
 # uv run streamlit run 03_streamlit_chat_streaming_exam.py

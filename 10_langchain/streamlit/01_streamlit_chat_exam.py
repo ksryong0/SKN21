@@ -22,7 +22,6 @@
 # - 반환된 container에 write() 하거나 with 문을 이용해 write() 한다.
 # - parameter
 #    - name:str =  입력하는 메세지 작성자. ("assistant", "ai", "human", "user" or str)
-#                       어시스턴트 = ai    human = user
 #        - "assistant", "ai": 챗봇이 작성한 메세지, "human", "user": 사용자가 작성한 메세지
 #    - avatar: str|st.image|None 
 #        - 문자열, emoji, 이미지 등을 사용하여 아바타 이미지를 표현한다.
@@ -69,14 +68,13 @@ ai_message = chatbot_message_list[idx] # AI의 답변
 if "chat_history" not in st.session_state:
     st.session_state['chat_history'] = []
 
+
 st.title("Chatbot 위젯 튜토리얼")
 
 # User input을 입력받는 chat_input 정의
 prompt = st.chat_input("User:")
 
 if prompt: # 글이 입력되었다면 prompt와 ai 응답을 화면에 출력
-    # container = st.chat_message('user')
-    # container.write("ssssss")
     # 사용자 질문 추가
     st.session_state['chat_history'].append(
         {"role":"user", "content":prompt}
@@ -84,19 +82,17 @@ if prompt: # 글이 입력되었다면 prompt와 ai 응답을 화면에 출력
     # AI 응답을 추가
     st.session_state['chat_history'].append(
         {"role":"ai", "content": ai_message}
-    )  
+    )
 
-    with st.chat_message("User"): # role은 필수적으로 줘야됨.
-        st.write(prompt)
-
-    with st.chat_message("ai"):
-        st.write(ai_message)
-
-    # 대화내역 출력 - chat_history의 모든 내역을 출력
+# 대화내역 출력 - chat_history의 모든 내역을 출력
 for chat_dict in st.session_state['chat_history']:
     with st.chat_message(chat_dict['role']):
         st.write(chat_dict["content"])
 
+
+
 # uv pip install streamlit
 # cd streamlit
-# 실행: uv run streamlit run 01_streamlit_chat_exam.py
+# 실행: uv run   streamlit run 01_streamlit_chat_exam.py
+
+

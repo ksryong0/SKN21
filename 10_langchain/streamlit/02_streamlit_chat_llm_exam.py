@@ -30,31 +30,30 @@ if "chat_history" not in st.session_state:
 
 st.title("Chatbot Service")
 user_input = st.chat_input("User:")
-
 if user_input:
-    # AI에게 요청
+    # AI 에게 요청
     ## prompt template 이용해서 prompt 완성
     query = prompt.invoke({
-        "query":user_input, # 질문
-        "history": st.session_state['chat_history'] # 대화내역
+        "query":user_input, #질문
+        "history": st.session_state['chat_history']  # 대화내역
     })
-
-    ## prompt를 model에 넣어서 답변을 요청
+    ## prompt를 model 넣어서 답변을 요청
     response = model.invoke(query)
-    ## 질문과 답변을 session state에 추가
+
+    ## 질문과 답변을 session_state에 추가
     # 사용자 질문
     st.session_state['chat_history'].append(
         {"role":"user", "content":user_input}
     )
-    # AI 답변 response: AIMessage 타입. content 속성으로 조회
+    # AI 답변 response: AIMessage 타입. content 속성으로 조회.
     st.session_state['chat_history'].append(
-        {"role":"ai", "content": response.content}
-    )  
-
-###########################################################################
+        {"role":"ai", "content":response.content}
+    )
+######################################
 # 출력 - session_state 저장된 대화내역을 chat_message()를 이용해 출력
-###########################################################################
-    # 대화내역 출력 - chat_history의 모든 내역을 출력
 for chat_dict in st.session_state['chat_history']:
     with st.chat_message(chat_dict['role']):
-        st.write(chat_dict["content"])
+        st.write(chat_dict['content'])
+
+
+# uv run streamlit run 02_streamlit_chat_llm_exam.py
