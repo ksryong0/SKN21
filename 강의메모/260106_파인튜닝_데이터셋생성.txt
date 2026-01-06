@@ -1,0 +1,20 @@
+LLM을 이용해 만든 데이터셋은 사람이 확인해야 한다.
+
+runpod gpu중에
+A100 H100 H200 많이씀
+
+GPU의 VRAM 용량을 봐야함.
+
+runpod가서
+pods로 가서
+맨 밑에 deploy 뭐시기 누르고
+주피터 랩 클릭
+
+시간당 얼마가 빠짐. 시간당 하드디스크 비용도 빠짐. 꼭 다쓰고 stop해놔야됨. stop해도 하드디스크 비용 나감. terminate 해야됨 완전 다 쓰면.
+왼쪽에 오른쪽 화살표 누르고
+11폴더/3_fine_tuning.ipynb 선택하고 열기
+더블클릭하면 코드가 나옴.
+
+raw->dataset->batch(dataloader)->모델
+collator함수:배치단위로 읽은걸 모델에 넣기전에 collator함수에 넣어줌. 전처리할 떄 씀. collator 결과를 모델에 넣음.
+
