@@ -7,3 +7,4 @@
 10_langchain/streamlit/.env
 *.env
 *.sqlite
+env
