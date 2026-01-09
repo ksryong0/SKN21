@@ -4,16 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel='stylesheet' type='text/css'>
-
+    <!-- css 파일 불러오기-->
+    <!--style>
+        /*class='color-red'인 모든 태그에 적용*/
+        .color-red{
+            color:red;
+        }
+        .bold{
+            font-weight: bold;
+        }
+        .box{
+            border:1px solid gray; /* 외곽 경계선, 두꼐, 스타일, */
+            padding: 5px;
+            margin: 5px;
+        }
+    </style> -->
 </head>
 <body>
-    <h1>인사말</h1>
-    <h2>안녕하세요.</h2>
-    <h3">반갑습니다.</h3>
+    <h1 style="color:blue">인사말</h1>
+    <h2 style="color:red box">안녕하세요.</h2>
+    <h3 style="color:red">반갑습니다.</h3>
     <div>
         Ipsum dolore voluptate exercitation magna excepteur enim sunt ex incididunt duis fugiat.<br>
-        Aliqua dolor excepteur laboris et ut amet ipsum sit reprehenderit eu sit deserunt.
+        Aliqua <span class="bold color-red">dolor excepteur</span> laboris et ut amet ipsum sit reprehenderit eu sit deserunt.
     </div>
 </body>
 </html>

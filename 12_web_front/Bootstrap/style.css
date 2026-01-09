@@ -1,0 +1,11 @@
+.color-red{
+    color:red;
+}
+.bold{
+    font-weight: bold;
+}
+.box{
+    border:1px solid gray; /* 외곽 경계선, 두꼐, 스타일, */
+    padding: 5px;
+    margin: 5px;
+}
