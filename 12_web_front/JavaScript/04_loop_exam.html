@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <h2>반복문 예제</h2>
+        <script>
+            // 반복문 : while, for , do while, for in
+
+            function whileExam(num) {
+                let list = [];
+                while (num < 10) {
+                    list.push(num);
+                    num++;
+                }
+                alert(list);
+            }
+            // whileExam(5)
+            function forExam() {
+                let list = [];
+                for (let num = 1; num < 10; num++) {
+                    list.push(num);
+                }
+                alert(list);
+            }
+            // forExam()
+            function doWhileExam() {
+                let list = [];
+                let num = null;
+                do {
+                    num = parseInt(
+                        prompt("짝수를 입력하세요. 홀수입력시 종료합니다.")
+                    );
+                    // if (num % 2 != 0) {
+                    //     break;
+                    // }
+                    if (num % 2 == 0)
+                        list.push(num);
+                } while (num % 2 == 0);
+                alert(list);
+            }
+            function while2(){
+                let list = [];
+                let num = parseInt(
+                        prompt("짝수를 입력하세요. 홀수입력시 종료합니다.")
+                    );
+                if (num % 2 == 0)
+                    list.push(num);
+                while (num % 2 == 0)
+                {
+                    num = parseInt(
+                        prompt("짝수를 입력하세요. 홀수입력시 종료합니다.")
+                    );
+                    // if (num % 2 != 0) {
+                    //     break;
+                    // }
+                    if (num % 2 == 0)
+                        list.push(num);
+                }
+                alert(list);
+            }
+            // while2()
+            // doWhileExam();
+            function forInExam() {
+                let list = ["a", "b", "c", "d", "e"];
+                
+                // idx : 각 원소의 식별자
+                for (let idx in list) {
+                    console.log(idx, list[idx]);
+                }
+            }
+            // forInExam()
+            function forInExam2() {
+                // JavaScript 객체
+                let info = {
+                    name: "홍길동",
+                    age: 20,
+                };
+                console.log(info.age, info["age"]);
+                for (let key in info) { // key: property 변수(키)가 문자열로 반환됨.
+                    console.log(key, info[key]);
+                }
+            }
+            forInExam2();
+
+        </script>
+    </body>
+</html>
