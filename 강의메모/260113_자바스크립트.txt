@@ -1,0 +1,12 @@
+16 23 30 31
+
+딕셔너리 키 값에 공백을 넣고 싶으면 ""로 묶어주면 된다.
+
+구조 분해 할당
+{name:new_name, age}
+name이라는 키에서 가져온걸 new_name이라는 키에 값을 넣어라
+
+예)            let {name:cust_name} = person;
+            // cust_name = person.name
+person 클래스의 name키의 값을 cust_name키에 넣어라.
+
