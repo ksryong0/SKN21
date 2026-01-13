@@ -12,22 +12,50 @@
         <div class="container mt-2">
             <form name="f1" action="/add" onsubmit="return checkSel()">
                 <input type="submit" value="전송" class="btn btn-primary mb-2"/><br />
-                <select name="phone" onchange="get_item()" class="form-select">
+                <!-- phone=011 -->
+                <select name="phone" onchange="get_item()" class="form-select"> <!-- multiple : 여러개 선택 가능 -->
                     <option value="default">번호선택</option>
                     <option>010</option>
                     <option>011</option>
                     <option>016</option>
                     <option>019</option>
                 </select>
+                <!-- name이 같으면 하나의 radio group으로 묶임. 
+                 같은 그룹에서는 하나만 선택가능-->
+                <input type="radio" name="option"> A<br>
+                <input type="radio" name="option" checked> B<br>
+                <input type="radio" name="option"> C<br>
+
             </form>
         </div>
         <script>
             function get_item() {
-                
+                // onchange handler에서 호출. change event => select에 선택된 값이 변경
+                const select = document.f1.phone;      
+
+                console.log("SelectedIndex", select.selectedIndex)          
+                // 선택된 option의 value
+                console.log("value", select.value);
+                const options = select.options;
+                console.log(options);
+                const selectedOption = options[select.selectedIndex];
+
+                const text = selectedOption.text;
+                const value = selectedOption.value;
+                console.log(text, value);
             }
 
             function checkSel() {
-                
+                // 번호선택(첫번째 option) 이 선택되면 전송되지 않게 한다.
+                // 몇번째 option이 선택되었는지 조회 -> select 객체. selectedIndex
+                const select = document.f1.phone;
+                const selectedIndex = select.selectedIndex;
+                console.log("selected Idx", selectedIndex);
+                if (selectedIndex == 0) {
+                    alert("번호를 선택하세요");
+                    return false;
+                }
+                return false;
             }
         </script>
     </body>

@@ -19,7 +19,7 @@
         <div id="root_layer" class="mb-3">
             <div id="in_1_1">1-1</div>
             <div id="in_1_2">1-2</div>
-            <div id="in_1_3">
+            <div id="in_1_3">1-3
                 <p id="in_2_1">&nbsp;&nbsp;&nbsp;&nbsp;2-1</p>
                 <div id="in_2_2">
                     <span id="in_3_1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3-1</span>,
@@ -34,16 +34,19 @@
         <script type="text/javascript">
             function findDOM() {
                 let in_1_3 = document.getElementById("in_1_3");
-                in_1_3.parentNode.style = "border:3px solid red;";
 
-                // in_1_3.previousElementSibling.style = "color:violet;";
+                // in_1_3.parentNode.style = "border:3px solid red"; // root에 빨간 선이 생긴거임.
+                in_1_3.parentNode.setAttribute("style","border:3px solid red");
+                console.log(in_1_3.parentNode.getAttribute("style"));
+                
+                in_1_3.previousElementSibling.style = "color:violet;"; // 형제 노드인데, 이전 노드.
 
-                // in_1_3.firstChild.nextSibling.style = "text-decoration:underline; color:green;";
+                in_1_3.firstChild.nextSibling.style = "text-decoration:underline; color:green;";
 
-                // document.getElementById("in_2_2").children[0].style = "text-decoration:underline";
+                document.getElementById("in_2_2").children[0].style = "text-decoration:underline";
 
-                // alert("children : " + in_1_3.children.length);
-                // alert("childNodes : " + in_1_3.childNodes.length);
+                alert("children : " + in_1_3.children.length);
+                alert("childNodes : " + in_1_3.childNodes.length);
             }
         </script>
     </body>

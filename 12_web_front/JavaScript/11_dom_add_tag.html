@@ -10,8 +10,10 @@
 
     <body>
         <form class="m-5">
-            <div class="row mb-3" id="layer"> 
-                <input type="text" name="tag" /><input type="text" name="tag" /><input type="text" name="tag" />
+            <div class="row mb-3" id="layer">
+                <input type="text" name="tag" />
+                <input type="text" name="tag" />
+                <input type="text" name="tag" />
             </div>
             <button type="button" class='btn btn-primary' onclick="addTag()">tag추가</button>
             <button type="submit" class='btn btn-primary' >전송</button>
@@ -19,7 +21,13 @@
 
         <script>
             function addTag() {
-                
+                // <input type="text" name="tag" /> 를 div#layer에 추가
+                tagInput = document.createElement("input"); //<input>
+                tagInput.setAttribute("type", "text"); // <input type="text">
+                tagInput.setAttribute("name", "tag"); //<input name="tag">
+
+                layer = document.querySelector("#layer");
+                layer.appendChild(tagInput);
             }
         </script>
     </body>

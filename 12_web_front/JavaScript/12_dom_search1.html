@@ -39,21 +39,38 @@
         </div>
         <script type="text/javascript">
             function searchByName() {
-                
-                
+                const nameList = document.getElementsByName("name");
+                for (let idx in nameList)
+                {
+                    nameList[idx].value = "안녕하세요";
+                }
             }
             function searchById() {
-                
-                
+                // id 속성으로 조회
+                // <... id='myid'>
+                // const myidId = document.getElementById("myid");
+                const myidId = document.querySelector("#myid");
+                myidId.value = "ID가 myid입니다.";
+                myidId.parentNode.style = "background-color:green";
             }
             function searchByTagName(tagName) {
-                
-                
+                // const myTagNameList = document.getElementsByTagName("textarea");
+                const myTagNameList = document.querySelectorAll("textarea");
+                for (let idx in myTagNameList)
+                {
+                    myTagNameList[idx].value = "Textarea 입니다.";
+                    myTagNameList[idx].rows = "10";
+                }
+                // myidTagName. = "tagname"
             }
-
+            // searchByClassName('pink_color');
             function searchByClassName(className) {
-                
-                
+                // const clsList = document.getElementsByClassName(className);
+                const clsList = document.querySelectorAll("span.pink_color");
+                for (let idx in clsList)
+                {
+                    clsList[idx].style = "color:pink";
+                }
             }
         </script>
     </body>

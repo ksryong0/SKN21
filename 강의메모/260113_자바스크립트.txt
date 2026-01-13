@@ -10,3 +10,25 @@ name이라는 키에서 가져온걸 new_name이라는 키에 값을 넣어라
             // cust_name = person.name
 person 클래스의 name키의 값을 cust_name키에 넣어라.
 
+DOM 객체
+
+name=value 쌍에서 같은 이름으로 여러개 보내도 됨.
+form : 여러 입력 태그들을 묶어줌
+
+<select>
+	<option> 1 </option>
+	<option> 2 </option>
+</select>
+
+input type="checkbox" 만 하면 선택만 됨. value 값을 꼭 지정해서, 선택됐을 때 어떤 값을 보낼지 설정해야됨. checked 속성을 보면 체크됐는지 안됐는지 알 수 있음.
+
+서버로 전송되는건 name 이다.
+id는 걍 id.
+
+getElementById(“태그ID속성명”) : Node
+여러개있으면 맨 위에 있는거 리턴
+
+getElementsByTagName(“태그이름”) : Node []
+– 태그 이름으로 조회
+– Node List (배열) 이 리턴된다
+

@@ -30,11 +30,35 @@
         <script>
             
             function appendChildTest() {
-                
+                const layer = document.getElementById("layer");
+                // 하위 노드의 개수
+                const cnt = layer.children.length;
+                console.log("layer하위노드개수:", cnt);
+
+                function getRandomHexColor() {
+                    const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+                    return '#' + randomColor.padStart(6, '0');
+                }
+                // layer에 <p>를 추가
+                const newP = document.createElement("p"); // <p>
+                newP.setAttribute("style", "background-color:skyblue; color:white;");
+
+                const txt = document.createTextNode(`${cnt+1}번 라인 - New Line`);
+                // p - txt
+                newP.appendChild(txt);
+                // #layer - p -txt
+                layer.appendChild(newP);
             }
             function insertBeforeTest() {
-                
+                const layer = document.getElementById("layer");
+                const newP = document.createElement('p');
+                newP.setAttribute("style", "background-color:black; color:white;");
 				
+                const txt = document.createTextNode("New Line 삽입");
+                newP.appendChild(txt);
+
+                // layer의 layer.children[2]의 앞의 자식노드로 추가.
+                layer.insertBefore(newP, layer.children[2]);
             }
             function deleteAllNode() {
                 
