@@ -1,0 +1,61 @@
+DORM Tree
+네비게이터:웹브라우저에 대한 정보
+screen:스크롤바
+
+원래 html 마크업 언어 설정 기본이 <br>같은거도 <br/> 로 해야 됨
+
+<td>a</td>
+
+자바스크립트에서 XMLHttpRequest가 생기면서 네트워크 작업이 가능해짐.
+
+비동기 동작.
+함수a가 실행중에 cpu가 동작하다가 i/o작업을 하는 중에는 cpu가 노니까 함수 b를 실행함. 
+i/o의 동작이 끝나는 걸 기다리고, 다음작업을 할수있게 cpu를 불러줌. promise 라고 하는듯.
+정상종료 : then()
+에러 : catch()
+
+await?
+async?
+
+fetch는 대표적인 i/o작업임.
+
+1. fetch(url)
+네트워크 작업. 뭐 달라그래서 받음. 일종의 i/o 작업. 얘가 진행하는 중에는 다른 작업을 할 수 있게 해줌. promise 객체를 반환. 여기까지 일 했다.
+
+await fetch(url) : promise 처리를 위한 가장 간단한 방법. 이건 비동기 작업이야. 다른 프로세스 일할 수 있어.
+함수에 붙여주는게 async 임. 비동기 함수야.
+await를 쓸 수 있는건 async 함수임.
+
+response:서버의 응답에 대한 정보.
+
+$ docker run -p 80:80 kennethreitz/httpbin
+
+http관련 요청을 테스트할수 있는 사이트
+https://httpbin.org/
+
+restful API?
+
+-----------------------------
+MVT
+
+함수 내부 구조
+1. 입력파라미터 검증 => View
+2. Business Logic : 실제 수행할 작업 => View?
+db 로직 => Model
+3. 결과를 출력 -> 처리 결과를 사용자에게 보여주는 것. => Template
+
+출력결과를 밖으로 빼자.
+business logic 중 반드시 들어가는게 db 로직임. db 작업.
+
+MVC에서는
+나누기, db 로직을 model
+입력파라미터검증을 controller
+결과출력을 view
+
+MVT패턴의 장점
+뭐 하나 틀렸을 때, 틀린 부분만 고치면 됨. 유지보수도 좋음. 재사용성도 좋음.
+
+mvt 패턴의 종류는 클래스 기반과 함수 기반이 있음.
+
+boiled template : mvt 패턴에 따라 틀을 만들어줌.
+
