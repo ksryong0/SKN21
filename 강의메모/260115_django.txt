@@ -1,0 +1,73 @@
+Model : DB와 통신하여 뷰에 반환.
+View : MVC에서 Controller 역할. 사용자와 직접 인터랙션. model한테 일시킴. 화면 필요하면 템플릿한테 요청. 
+Template: MVC에서 View역할.
+
+python manage.py runserver
+
+ORM이란?
+member class - member table 매핑해둠.
+
+name이 홍길동인 것을 select -> select 쿼리 결과로 나온 member table의 name을 member class의 name에 저장. 테이블의 age를 클래스의 age에 저장.
+
+ORM의 장점
+비지니스 로직과 DB 로직을 분리할 수 있다.
+단점
+DBMS 고유 기능을 사용할 수 없다.
+복잡한 쿼리 처리 어렵.
+
+모델클래스:db와 연결할 클래스. 필드를 지정해야함.
+필드 : 객체에서는 인스턴스 변수. 테이블에서는 컬럼
+
+makemigrations : migration을 위한 코드 생성?
+
+models.py
+
+터미널에서
+python manage.py makemigrations
+실행
+
+python manage.py migrate
+
+python manage.py runserver
+
+http://127.0.0.1:8000/admin
+
+python manage.py inspectdb
+
+ORM_Exam.ipynb
+python manage.py shell
+from polls.models import Choice, Question
+quit() 누르고 쉘 나와서
+uv pip install ipykernel
+그러고 주피터 노트북 실행
+
+chaining 가능 : select 한 결과를 바탕으로 order 같은 추가적인 쿼리를 실행할 수 있음
+
+exclude:not 같은거
+
+choice
+id
+c_t
+vote
+Question 참조 Q
+
+자식에서 부모 조회하기는 쉬움.
+
+reverse_name ㅣ
+
+강의자료  53p
+raw:모델과 관련된 select문만 지원.
+
+delete시 pk값이 필요. pk값이 있으면 삭제
+
+| 번호 | 프로젝트      | 핵심 스킬 무게중심      | 요구 숙련도 총평      |
+| -- | --------- | --------------- | -------------- |
+| 1  | 문서검색(RAG) | LLM + 데이터 파이프라인 | **중하 (주니어)**   | 1
+| 2  | 대화형 상품추천  | 추천 + 대화 설계      | **중 (주니어~중급)** | 3
+| 3  | sLLM 플랫폼  | 모델·시스템·최적화      | **상 (중급 이상)**  |       5
+| 4  | AI 인플루언서  | 프롬프트·콘텐츠        | **중하 (기획 중심)** |     6
+| 5  | AI 모의면접   | 평가·LLM 추론       | **중 (주니어 이상)** |          4
+| 6  | 고객상담 챗봇   | 실무 UX·RAG       | **중하 (주니어)**   |          2
+
+1 6 2 4
+rag 대화형 챗봇 인플루

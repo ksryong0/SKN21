@@ -1,7 +1,7 @@
 # 프로젝트 생성
 1. 디렉토리 생성
 -mypoll(application 디렉토리)
-2. test_project 폴더로 이동
+2. mypoll 폴더로 이동
 폴더 구조에서 cmd 입력하여 터미널 열기. 파워쉘로 열면 안됨.
 3. 가상환경
 - uv venv .venv --python=3.12
