@@ -1,0 +1,16 @@
+
+
+Template 파일 저장 dir
+- app(polls)\templates
+
+templates 밑에 polls 디렉토리 또 만듬
+\polls
+
+template파일 생성: 이름.html
+
+templates밑에 polls 밑에 welcome.html 생성. 밑줄 확인(현재폴더가 템플릿인지 폴스인지)
+
+127.0.0.1:8000/polls/welcome
+127.0.0.1:8000/polls/list
+
+http://127.0.0.1:8000/polls/vote_form
