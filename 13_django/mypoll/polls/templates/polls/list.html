@@ -9,7 +9,8 @@
         <!-- 반복문 - question_list(context_value:QuerySet)의 Question들을 출력 -->
         {% for question in question_list %}
             <li>
-                <a href="/polls/vote_form/{{question.pk}}">
+                <!-- <a href="/polls/vote_form/{{question.pk}}"> -->
+                <a href="{% url 'polls:vote_form' question.pk %}">
                     <!-- {{question.pk}}. {{question.question_text}} -->
                      {{question.pk}}. {{question.question_text | truncatewords:2}}
                      - 글자수:{{question.question_text | length}}
