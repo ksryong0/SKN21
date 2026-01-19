@@ -4,6 +4,8 @@ from django.urls import reverse
 # url conf의 설정 이름으로 url을 조회하는 함수
 ## path("url", view함수, name='name')
 # reverse("name") => url
+from django.db import transaction # DB Transaction 처리.
+
 from datetime import datetime
 from .models import Question, Choice
 
@@ -158,3 +160,97 @@ def vote_result(request, question_id):
         "polls/vote_result.html",
         {"question":question}
     )
+
+# 설문(질문)을 등록 처리.
+# 요청 URL: /polls/vote_create
+# View함수: vote_create
+#   - HTTP 요청 방식에 따라 입력양식을 제공할지 처리할지 결정. url 하나로 get, post 둘다 처리하도록 함.
+#       - GET: 입력양식을 제공(설문문제와 보기를 입력할 수 있는 화면). 값을 받아올 때.
+#       - POST: 등록처리. 이거 처리해줘. 서버한테 값을 줌.
+# 응답: - GET 처리: (template) polls.vote_create.html
+#       - POST : redirect 방식으로 응답 ==> list View를 요청.
+# Http 요청방식 조회 - request.method ("GET", "POST")
+def vote_create_old(request):
+    http_method = request.method
+    if http_method == "GET":
+        # 입력 폼 제공
+        return render(
+            request,
+            "polls/vote_create.html"
+        )
+    elif http_method == "POST":
+        # 등록 처리
+        # 1. 요청(Path)파라미터 읽기.
+        # 2. 요청파라미터 검증. - 성공->처리, 실패->입력폼페이지를 응답한다.
+        # 3. 업무 처리 -> DB작업
+        # 4. 응답.
+        
+        # 요청 파라미터 조회 - request.POST(GET) => dictionary 구현체
+        ## 요청 파라미터 중 question_text를 조회
+        question_text = request.POST.get("question_text") # str 반환.
+        ## 요청 파라미터 중 choice_text를 조회(같은 이름으로 여러개 전달)
+        ### choice_text=보기1&choice_text=보기2&choice_text=보기3...
+        choice_list = request.POST.getlist("choice_text") # list[str]
+
+        # 요청 파라미터 검증(질문: 1글자 이상, 보기: 2개이상 각각 1글자 이상.)
+        if not question_text.strip(): # 빈문자열일 경우
+            return render(
+                request,
+                "polls/vote_create.html",
+                {"error_msg": "질문을 한글자 이상 입력하세요.",
+                 "question_text": question_text,
+                 "choice_list": choice_list}
+            )
+        
+        ## 보기검증. choice_text가 넘어온게 없거나
+        ##          (choice_text가 넘어온게 있는데 값이 있는 것이 2개가 안되면) ==> 검증 실패
+        if not choice_list or (choice_list and len([c for c in choice_list if len(c.strip()) > 0]) < 2):
+            return render(
+                request,
+                "polls/vote_create.html",
+                {"error_msg": "보기는 두개 이상 입력해야 합니다.",
+                 "question_text": question_text,
+                 "choice_list": choice_list}
+            )
+        try:
+            # with block을 정상적으로 처리하면 commit 실행
+            # with block 실행 중 Exception이 발생하면 rollback(Insert작업을 처음상태로 돌린다.)
+            
+            with transaction.atomic(): # Transaction 시작
+                # 검증 통과 -> DB에 저장.(Insert)
+                # 모델.save()
+                q = Question(question_text=question_text) # id/pub_date 자동입력.
+                q.save() # 메모리에만 저장해놓고 실제 하드에는 저장 안함. with절에서 문제가 없으면 하드에 저장.
+
+                # raise Exception("문제가 발생했습니다.")
+
+                for c in choice_list:
+                    choice = Choice(choice_text=c, question=q) # id/vote는 자동입력
+                    choice.save()
+        except Exception as e:
+            # error page로 이동
+            return render(
+                request,
+                # "polls/error.html", 
+                "error.html", 
+                {"error_message":f"질문을 저장하는 도중 문제가 발생했습니다. 관리자에게 문의하세요."}
+            )
+        # 4. 응답 - list로 redirect 방식으로 이동.
+        return redirect(reverse("polls:list"))
+
+from .forms import QuestionForm
+
+# forms.py의 Form을 이용한 요청파라미터 처리 view함수
+def vote_create(request):
+    
+    if request.method == "GET":
+        # 등록 폼 페이지 반환
+        ## 등록 폼 -> forms.QuestionForm 를 이용
+        q_form = QuestionForm()
+
+        return render(
+            request, "polls/vote_create_form.html", {"q_form":q_form}
+        )
+    elif request.method == "POST":
+        # 등록 처리
+        pass

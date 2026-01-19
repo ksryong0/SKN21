@@ -1,10 +1,23 @@
-<!-- 'layout/main_layout.html' 레이아웃을 여기로 불러와라 -->
-{% extends 'layout/main_layout.html' %}
-
-<!-- main_layout.html의 block에 넣을 내용들만 정의 -->
-{% block title %}설문 목록{% endblock title %}
-{% block contents %}
-<h1>설문목록</h1>
+<!-- polls/templates/polls/list.html-->
+ {# django template 주석 #}
+ {% comment %}
+주석
+Django template 주석은 client(web server)로 전송되지 않는다.
+Template Enginge이 template 파일 실행시 무시한다.
+ {% endcomment %}
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>질문 목록</title>
+</head>
+<body>
+    {# <a href="/polls/vote_create">질문 등록</a> <!-- 절대경로 --> #}
+    </a>
+    <hr>
+    <h1>설문목록</h1>
         <!-- ul은 점 형태. 숫자는 ol-->
         <!-- 반복문 - question_list(context_value:QuerySet)의 Question들을 출력 -->
         {% for question in question_list %}
@@ -21,4 +34,5 @@
         <b>아직 등록된 질문이 엄슴</b>
         {% endfor %}
     </ul>
-{% endblock contents %}
+</body>
+</html>

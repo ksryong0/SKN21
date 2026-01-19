@@ -1,0 +1,85 @@
+config폴더에 urls.py
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    # 1. ip:포트번호 이후, client의 요청경로 2. 호출할 view, 3. name="설정 이름"
+    # path('polls/welcome', welcome, name="poll_welcome")
+
+    # polls/ 로 시작하는 url 경로로 요청이 들어오면 polls앱/urls.py 의 설정으로 가서 나머지를 확인.
+    path("polls/", include("polls.urls")), 
+]
+
+127.0.0.1:8000은 못읽어들임.
+127.0.0.1:8000/admin/...
+127.0.0.1:8000/polls/...
+요런거만 읽어들임
+
+-------------------------
+
+view함수->요청->응답
+
+views.py에 함수 구현.
+templates에 html 화면 구현.
+urls.py urlpatterns에 등록.
+
+views.py에서 request는 필수로 받아야됨. 
+templates를 리턴해줌.
+templates 확장자는 html을 안줘도 되지만, 관례적으로 html으로 줌. 실제파일은 html이 아님. 동적인 프로그램 코드를 만든거임. html을 출력하는 프로그램을 만든거임. 
+--------------------
+등록(db에 Insert/Update), 조회 
+1. 입력 Form에서 수정하고 등록 버튼을 누르면
+2. 처리
+
+redirect 방식:새로고침시 다시 등록되지 않도록 함. 뷰를 나눠서 처리.
+
+method를 안써두면 get방식.
+submit시 action에 url이 없으면, 해당 url이 다시 실행됨.
+---------------------트랜잭션 기억해야함. 강사님 강조-----------------
+
+트랜잭션:질문과 choice가 모두 save됐을때만 db에 등록하도록 처리하는거. rollback과 commit을 자동적으로 처리해줌.
+
+중간에 문제가 생기면 rollback.
+완료됐을 떄 : commit
+------------------------------------------------------------------------
+템플릿
+
+프로젝트
+app1, app2이 공통적으로 필요한거 있을 때.
+dirs에 저장.
+
+config/settings.py 에 있는 BASE_DIR : 루트 디렉토리
+
+템플릿문법들
+장고 template 한 줄 주석
+▪ {# 주석 내용 #}
+– 장고 template block 주석. 클라이언트한테 안간다.
+{% comment %}
+ 주석 내용
+{% endcomment %}
+– html 주석
+▪ <!-- 주석내용 --> 
+
+template 필터
+{{변수|필터}}
+필터 종류는 많다. 필터는 사용자가 만들수도 있다.
+
+template
+- 주석 <!-- -->
+- 변수 {{변수명}}
+- 태그 {%  %}
+
+root/templates 밑에 layout 디렉토리 생성.
+layout 디렉토리 밑에 main_layout.html 생성
+
+https://getbootstrap.com/docs/5.3/getting-started/download/#cdn-via-jsdelivr
+
+polls/template/polls 아래 backup 디렉토리 생성
+polls/template/polls 에 있는 html 파일들 붙여넣기
+polls/template/polls 로 이동.
+
+아래 것을 Form Field라고 함.
+class PostForm(forms.Form):
+ title = forms. CharField()
+ content = forms. CharField(widget=forms.Textarea)
+
+polls 폴더 밑에 forms.py 생성
+
