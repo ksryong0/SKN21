@@ -83,3 +83,7 @@ class PostForm(forms.Form):
 
 polls 폴더 밑에 forms.py 생성
 
+페이징
+데이터가 1000개일때, 10개씩 한페이지에 보여주는거
+
+모델폼? 모델을 이용해서 폼을 만듬

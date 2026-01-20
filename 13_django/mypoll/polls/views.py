@@ -5,6 +5,7 @@ from django.urls import reverse
 ## path("url", view함수, name='name')
 # reverse("name") => url
 from django.db import transaction # DB Transaction 처리.
+from django.core.paginator import Paginator
 
 from datetime import datetime
 from .models import Question, Choice
@@ -54,7 +55,7 @@ def welcome_old(request):
 ## 요청 url: polls/list
 ## view 함수: list
 ## template: polls/list.html
-def list(request):
+def list_old(request):
     print("list 실행")
     # 1. DB에서 질문 목록 조회 -> Model 사용
     question_list = Question.objects.all().order_by("-pub_date")
@@ -66,7 +67,54 @@ def list(request):
     )
     print(type(response)) # server를 실행한 터미널에 출력.
     return response
-    # 
+
+########paging 처리 list
+# 현재 페이지의 데이터-page객체
+# 현재 페이지가 속한 패이지 그룹의 페이지번호 start/end index
+# 현재 페이지 그룹의 시작 페이지가 이전 페이지가 있는지 여부, 있다면 이전 페이지 번호
+# 현재 페이지 그룹의 끝 페이지가 다음 페이지가 있는지 여부, 있다면 다음 페이지 번호
+def list(request):
+    paginate_by = 10 # 한 페이지당 데이터 개수
+    page_group_count = 10 # 페이지 그룹당 페이지 수
+    # http://ip:port/polls/list?page=6
+    current_page = int(request.GET.get("page", 1))# 현재 조회 요청이 들어온 페이지 번호. GET 방식의 요청파라미터
+    
+    # Paginator
+    q_list = Question.objects.all().order_by("-pk")
+    pn = Paginator(q_list, paginate_by)
+
+    # 현재 페이지가 속한 PageGroup의 시작 페이지의 index, 종료 페이지의 index
+    start_index = int((current_page - 1)/page_group_count) * page_group_count
+    end_index = start_index + page_group_count
+
+    page_range = pn.page_range[start_index : end_index] # 시작 ~ 끝 페이지 번호 조회
+    
+    # template에 전달할 context value dictionary
+    context_value = {
+        "page_range": page_range,
+        "question_list": pn.page(current_page) # Page[Question]
+    }
+
+    # PageGroup이 시작페이지가 이전페이지가 있는지 여부, 이전 페이지 번호
+    # PageGroup의 마지막페이지가 다음 페이지가 있는지 여부, 다음 페이지 번호
+    
+    start_page = pn.page(page_range[0]) # 시작 페이지 Page객체
+    end_page = pn.page(page_range[-1]) # 마지막 페이지 Page객체
+    
+    if start_page.has_previous():
+        context_value['has_previous'] = start_page.has_previous()
+        context_value['previous_page_number'] = start_page.previous_page_number()
+        
+    if end_page.has_next():
+        context_value['has_next'] = end_page.has_next()
+        context_value['next_page_number'] = end_page.next_page_number()
+
+    # 응답 template 호출
+    return render(
+        request,
+        "polls/list.html",
+        context_value
+    )
 
 # 개별 설문을 할 수 있는 페이지(설문폼)로 이동.
 ## 질문 id를 path parameter로 받아서 
@@ -238,19 +286,59 @@ def vote_create_old(request):
         # 4. 응답 - list로 redirect 방식으로 이동.
         return redirect(reverse("polls:list"))
 
-from .forms import QuestionForm
+from .forms import QuestionForm, ChoiceForm, ChoiceFormSet
 
 # forms.py의 Form을 이용한 요청파라미터 처리 view함수
 def vote_create(request):
-    
+
+    # <input type=text x extra
+
     if request.method == "GET":
         # 등록 폼 페이지 반환
         ## 등록 폼 -> forms.QuestionForm 를 이용
         q_form = QuestionForm()
+        c_formset = ChoiceFormSet() # 보기들
 
         return render(
-            request, "polls/vote_create_form.html", {"q_form":q_form}
+            request, "polls/vote_create_form.html", {"q_form":q_form, "c_formset":c_formset}
         )
     elif request.method == "POST":
         # 등록 처리
-        pass
+        # 요청 파라미터 조회+검증 -> Form을 이용해서 조회/검증
+        # 요청파라미터의 값을 속성으로 가지는 Form
+        # 요청파라미터 조회해서 검증을 통과하면 Form 객체에 넣는다.
+        # 요청파라미터값들을 form의 dictionary로 관리되고 cleaned_data 속성으로 조회가능.
+        q_form = QuestionForm(request.POST)
+        c_formset = ChoiceFormSet(request.POST) #, prefix='choice') 생성할 때 prefix를 지정했으면 여기서도 지정해줘야함.
+        # print("----------------------------", q_form)
+        # print("----------------------------", c_formset)
+
+        # 검증을 통과 했는지 여부 - form.is_valid(): bool (True-통과, False-검증실패)
+        if q_form.is_valid() and c_formset.is_valid(): # 요청파라미터 검증에 문제 없으면
+            # 요청파라미터값들 조회. form객체.cleaned_data: dict
+            question_text = q_form.cleaned_data['question_text'] # key:Field 이름
+            choice_list = []
+            for c_form in c_formset:
+                choice_list.append(c_form.cleaned_data['choice_text'])
+            # DB 저장
+            try:
+                with transaction.atomic():
+                    q = Question(question_text=question_text)
+                    q.save()
+                    
+                    for choice_text in choice_list:
+                        c = Choice(choice_text=choice_text, question=q)
+                        c.save()
+            except:
+                return render(request, "error.html", {"error_message":"질문/보기 DB 저장도중 문제 발생."})
+            
+            return redirect(reverse("polls:list"))
+
+
+        else: # 요청파라미터 검증 실패 => Form객체는 ValidationError 객체를 가지고 있다.
+            # 에러 처리 페이지로 이동. --> 등록페이지로 이동
+            return render(
+                request,
+                "polls/vote_create_form.html",
+                {"q_form":q_form, "c_formset":c_formset} # 검증 실패한 form들을 전달.
+            )

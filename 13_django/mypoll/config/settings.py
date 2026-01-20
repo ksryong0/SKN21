@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'polls'
+    'polls', # polls app 등록
+    'account',
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,10 @@ TIME_ZONE = 'Asia/Seoul'
 USE_I18N = True
 
 USE_TZ = True
+#########################################
+# 사용자 관리시 사용하는 UserModel 변경
+#########################################
+AUTH_USER_MODEL = "account.CustomUser"
 
 
 # Static files (CSS, JavaScript, Images)

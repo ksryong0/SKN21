@@ -5,10 +5,12 @@
 {% block title %}설문 목록{% endblock title %}
 {% block contents %}
 <h1>설문목록</h1>
+    <ul class="list-group"> 
         <!-- ul은 점 형태. 숫자는 ol-->
         <!-- 반복문 - question_list(context_value:QuerySet)의 Question들을 출력 -->
         {% for question in question_list %}
-            <li>
+            <li class="list-group-item list-group-item-action">
+                <!-- list-group-item-action 하면 마우스오버시 색이 바뀜 -->
                 <!-- <a href="/polls/vote_form/{{question.pk}}"> -->
                 <a href="{% url 'polls:vote_form' question.pk %}">
                     <!-- {{question.pk}}. {{question.question_text}} -->
@@ -19,7 +21,51 @@
             </li>
         {% empty %}
         {# 처음부터  question_list가 비어있으면 #}
-        <b>아직 등록된 질문이 엄슴</b>
+        <b>아직 등록된 질문이 없음</b>
         {% endfor %}
     </ul>
+
+<!-- 페이징 처리 - 페이지 링크들 출력 -->
+<ul id="page_group" class="pagination mt-3">
+    {# 이전 페이지 그룹으로 이동하는 버튼 #}
+    {% if has_previous %}
+        <li class="page-item">
+            <a href="{% url 'polls:list' %}?page={{previous_page_number}}" class="page-link">
+                이전
+            </a>
+        </li>
+    {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">이전</span>
+        </li>
+    {% endif %}
+
+    {# 현재 페이지 그룹의 페이지로 이동하는 링크 - 현재 페이지는 링크를 걸지 않는다. #}
+
+    {% for page_no in page_range %}
+        <!-- question+list: Page객체 page객체.number -> 페이지 번호 -->
+        {% if question_list.number == page_no %}
+            <li class="page-item active">
+                <span class="page-link">{{page_no}}</span>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a href="{% url 'polls:list' %}?page={{page_no}}" class="page-link">{{page_no}}</a>
+            </li>
+        {% endif %}
+    {% endfor %}
+
+    {# 다음 페이지 그룹으로 이동하는 버튼 #}
+    {% if has_next %}
+        <li class="page-item">
+            <a href="{% url 'polls:list' %}?page={{next_page_number}}" class="page-link">
+                다음
+            </a>
+        </li>
+    {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">다음</span>
+        </li>
+    {% endif %}
+</ul>
 {% endblock contents %}
