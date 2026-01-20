@@ -45,15 +45,32 @@
    - config/settings.py
 	- LANGUAGE_CODE = 'ko-kr'  //언어코드-국가
 
-# account app 구현
+
+
+
+
+# accout app 구현
 - 사용자 관리 앱
 
 - app을 생성
-  - python manage.py
+  - python manage.py startapp account
+  - config.settings INSTALLED_APP에 추가.
+  - account app용 urls.py 를 정의
+    - account/urls.py urlpatterns 설정
+    - config/urls.py 에 account urls.py(url-conf)를 등록
 
+- Model
+  - AbstractUser 상속
+  - admin.py 에 등록 (admin app에서 관리할 수있는 데이터)
+  - 사용자 관리 할 때 사용할 User 모델을 기본 모델에서 우리가 만든 것으로 변경
+    - config.setting : AUTH_USER_MODEL = "account.CustomUser"
 
+account\migrations 디렉토리 삭제
+root\db.sqlite3
 
-
-
-
-
+  - python manage.py makemigrations account
+  - python manage.py migrate
+  - python manage.py createsuperuser
+  
+  - python manage.py runserver
+http://127.0.0.1:8000/admin
