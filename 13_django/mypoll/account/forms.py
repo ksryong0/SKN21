@@ -38,7 +38,7 @@ class CustomUserCreationForm(UserCreationForm):
     # 검증 메소드 추가(전체:clean(), 개별 필드:clean_필드명())
     def clean_name(self):
         name = self.cleaned_data['name'] # 기본 검증 통과한 요청파라미터 조회.
-        if len(name) < 6 : # 이름은 두글자 이상이면 통과.
+        if len(name) < 2 : # 이름은 두글자 이상이면 통과.
             raise forms.ValidationError("이름은 두글자 이상 입력하세요.")
         return name
     
@@ -57,6 +57,6 @@ class CustomUserChangeForm(UserChangeForm):
     def clean_name(self):
         name = self.cleaned_data['name'] # 기본 검증 통과한 요청파라미터 조회.
         if len(name) < 2 : # 이름은 두글자 이상이면 통과.
-            raise forms.ValidationError("보기는 두글자 이상 입력하세요.")
+            raise forms.ValidationError("이름은 두글자 이상 입력하세요.")
         return name
 

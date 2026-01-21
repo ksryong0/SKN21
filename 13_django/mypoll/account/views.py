@@ -100,7 +100,7 @@ def user_login(request):
             
             if request.GET.get("next"): #next 쿼리스트링이 있다면
                 # 로그인한 상태에서 호출해야 하는 url을 안하고 호출한 경우 원래 요청한 url
-                return redirect(reverse("polls:next"))
+                return redirect(request.GET.get("next"))
             return redirect(reverse("polls:welcome"))
         else:
             ## 불일치 - 로그인 화면으로 이동
@@ -157,7 +157,7 @@ def update(request):
 def password_change(request):
     if request.method=="GET":
         form = PasswordChangeForm(get_user(request)) # User Model을 넣어서 생성
-        return render(request, "account/update.html", {"form":form}) 
+        return render(request, "account/password_change.html", {"form":form}) 
     
     elif request.method == "POST":
         # 요청파라미터 조회 + 검증
