@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -289,6 +290,7 @@ def vote_create_old(request):
 from .forms import QuestionForm, ChoiceForm, ChoiceFormSet
 
 # forms.py의 Form을 이용한 요청파라미터 처리 view함수
+@login_required
 def vote_create(request):
 
     # <input type=text x extra

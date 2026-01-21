@@ -1,0 +1,15 @@
+{% extends "layout/main_layout.html" %}
+{% load django_bootstrap5 %}
+{% block title %}회원가입{% endblock title %}
+{% block contents %}
+<form method="post">
+    {% csrf_token %}
+    <!-- {{form}} -->  
+    {% bootstrap_form form %}
+    <input type="date">
+    <div>
+        <button type="submit" class="btn btn-primary">가입</button>
+        <button type="reset" class="btn btn-primary">초기화</button>
+    </div>
+</form>
+{% endblock contents %}

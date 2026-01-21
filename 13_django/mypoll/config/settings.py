@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'polls', # polls app 등록
     'account',
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -116,6 +117,12 @@ USE_TZ = True
 #########################################
 AUTH_USER_MODEL = "account.CustomUser"
 
+#########################################
+# 로그인 안한 사용자가 
+# @login_required View 함수를 호출했을 때 이동할 url
+# -> 로그인 페이지로 이동(/account/login?next=View의 URL)
+#########################################
+LOGIN_URL = '/account/login'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/

@@ -1,0 +1,12 @@
+폼 클래스
+모델 클래스 제공.
+모델 필드, 폼 필드는 맞지 않음.
+
+account밑에 forms.py 생성.
+
+터미널에서
+pip inp
+
+장고 로그인 관련 폼
+AuthenticationForm
+
