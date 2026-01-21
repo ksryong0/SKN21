@@ -117,6 +117,8 @@ USE_TZ = True
 #########################################
 AUTH_USER_MODEL = "account.CustomUser"
 
+# http://127.0.0.1:8000/polls/vote_create -> login 페이지로 이동
+# http://127.0.0.1:8000/account/login?next=/polls/vote_create
 #########################################
 # 로그인 안한 사용자가 
 # @login_required View 함수를 호출했을 때 이동할 url
