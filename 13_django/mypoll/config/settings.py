@@ -129,4 +129,37 @@ LOGIN_URL = '/account/login'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+#######################
+# static 파일들을 요청할 때 시작할 url 경로
+#
+# app/static -> 아래있는 경로의 static 파일 요청 url
+## http://ip:port/STATIC_URL/
+
+# polls/static/polls/imgs/survey.png
+#   -> http://127.0.0.1:8000/static/polls/imgs/survey.png
+STATIC_URL = '/static/'
+
+# static/앱이름/imgs/...
+
+# app/static 디렉토리 이외의 경로에 static 파일들을 넣을 경우 디렉토리를 등록해야한다.
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+STATIC_ROOT = BASE_DIR / "static_files"
+# python manage.py collectstatic 을 실행.
+# 모든 static 경로(app/static, STATICFILES_DIRS)의 static 파일들을
+# STATIC_ROOT 디렉토리 아래로 복사한다.
+# - 모든 static 파일들을 한 곳으로 모아준다.
+# 운영환경 (django1.pdf 참고)
+# 웹서버(HTTP서버) + WSGI/ASGI(장고실행환경)
+## WSGI: backend 동적 코드를 실행(MVT 컴포넌트를 실행)
+## 웹서버: 정적파일을 서비스(html, css, js, img,, client에게 응답)
+# collectstatic 명령어로 static 파일들을 한 디렉토리로 모아놓고 web 서버에
+# 그 디렉토리를 설정해서 서비스 할 수 있게 한다.
+
+###################################
+# 파일 업로드 설정
+###################################
+MEDIA_URL = "/media/" # 업로드된 파일 다운로드 요청 URL 경로
+MEDIA_ROOT = BASE_DIR / "media" # 업로드된 파일을 저장할 디렉토리
+
+# ip:port/media/xxxx  ->   xxxx파일을 MEDIA_ROOT 디렉토리 아래서 찾는다.

@@ -22,9 +22,20 @@
         <td>{{user.birthday}}</td>
     </tr>
 </table>
+{% if user.profile_img %}
+    <a href="{{user.profile_img.url}}">{{user.profile_img}}</a><br>
+    <img src="{{user.profile_img.url}}">
+    사진이 있습니다.
+{% else %}
+    프로필 사진이 없습니다.
+{% endif %}
+
 
 <div class="mt-3">
-    <a href="{% url 'account:update' %}">정보수정</a>
-    <a href="{% url 'account:password_change' %}">패스워드 변경</a>
+    <a href="{% url 'account:update' %}" class="btn btn-primary">정보수정</a>
+    <a href="{% url 'account:password_change' %}" class="btn btn-primary">패스워드 변경</a>
+    <a href="{% url 'account:delete' %}" class="btn btn-danger" onclick="return confirm('정말 탈퇴하겠습니까?')">
+        탈퇴
+    </a>
 </div>
 {% endblock contents %}

@@ -20,8 +20,18 @@ class CustomUser(AbstractUser):
         verbose_name="생일",
         null=True,  # Nullable 컬럼
         blank=True, # Form 관련 설정. 빈 문자열(값)을 받을 수 있다.
-        
     )
+    # 프로필 사진 - 이미지를 받는다.
+    profile_img = models.ImageField(
+        verbose_name="프로필 사진",
+        null=True, # DB: NULL 허용컬럼
+        blank=True, # Form: required=False
+        upload_to="images/profile/%Y/%m/%d/%H"
+        # MEDIA_ROOT 아래 어디에 저장할 지 경로.
+        # media\images\profile\업로드시점_년도\월\일
+    )
+    # uv pip install pillow
+    # python manage.py makemigrations, migrate
 
     def __str__(self):
         return f"username: {self.username}, name: {self.name}"

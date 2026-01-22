@@ -38,8 +38,10 @@ def create(request):
     elif request.method == "POST":
         # 가입처리
         ## 1. 요청파라미터 조회 및 검증 -> Form
-        form = CustomUserCreationForm(request.POST)
-        
+        # request.POST: 일반 요청파라미터(text) 저장.
+        # request.FILES: 업로드된 파일 (요청파라미터)
+        form = CustomUserCreationForm(request.POST, request.FILES)
+        # 업로드된 파일을 설정된 저장경로에 저장하고 그 경로를 Field에 가지고 있는다.
         if form.is_valid(): #요청 파라미터에 문제가 없는 경우
             ## 2. DB에 저장
             # ModelForm은 save()를 제공. 요청파라미터 값들을 DB에 insert/update 해준다.
@@ -136,7 +138,7 @@ def update(request):
     elif request.method == "POST":
         # 수정 처리
         # 1. 요청파라미터 조회 + 검증   
-        form = CustomUserChangeForm(request.POST, instance=get_user(request))
+        form = CustomUserChangeForm(request.POST, request.FILES, instance=get_user(request))
         
         if form.is_valid():
             # DB에 저장
@@ -170,3 +172,16 @@ def password_change(request):
             return redirect(reverse("account:detail"))
         else:
             return render(request, "account/password_change.html", {"form":form})
+        
+# 사용자 삭제(탈퇴) 처리
+# 요청 URL: /account/delete
+# view함수: user_delete
+# 응답: redirect - polls:welcome
+@login_required
+def user_delete(request):
+    # 로그인한 사용자를 삭제
+    user = get_user(request) # 로그인한 사용자의 Model
+    user.delete() # DB에서 삭제
+    # 로그아웃 처리
+    logout(request)
+    return redirect(reverse("polls:welcome"))

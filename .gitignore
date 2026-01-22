@@ -8,3 +8,4 @@
 *.env
 *.sqlite
 env
+static_files/

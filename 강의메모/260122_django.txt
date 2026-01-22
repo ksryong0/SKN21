@@ -1,0 +1,137 @@
+강의자료 장고2 9page~
+
+확장 사용자 관리 모델 이용한 구현~
+
+핵심내용
+models.py
+abstractuser 모델을 상속받아서 만듬.
+
+forms.py
+usercreationform을 상속받아서 만듬.
+
+views.py
+authenticationform으로 폼 만듬.
+authenticate라는 함수로 암호화된 패스워드들을 알아서 처리하여 일치, 불일치를 객체로 반환.
+
+@login_required : 로그인한 사람만 요청할 수 있는 뷰
+-------------------
+if request.GET.get("next"): #next 쿼리스트링이 있다면
+      # 로그인한 상태에서 호출해야 하는 url을 안하고 호출한 경우 원래 요청한 url
+       return redirect(request.GET.get("next"))
+
+next라는 쿼리스트링이 있으면,
+next뒤를 읽어서 redirect
+-------------------
+update, password_change
+
+password_change
+장고 passwordchangeform 사용.
+post 방식일 때, 요청파라미터 조회 및 검증
+update_session_auth_hash : 세션정보 업데이트.
+
+------------------------------
+로그인을 해야 보이는 화면과 로그인을 안해야 보이는 화면이 있음.
+templates/layout/main_layout.html 에서 아래 코드처럼 하면
+조건에 따라, 특정 화면을 보이게 또는 안보이게 할 수 있음
+
+{% if user.is_authenticated %}
+                <a href="{% url 'polls:vote_create' %}" class="nav-link">설문 등록</a>
+                <a href="{% url 'account:detail' %}" class="nav-link">{{user.username}}</a>
+                <a href="{% url 'account:logout' %}" class="nav-link">로그아웃</a>
+            {% endif %}
+            {% if not user.is_authenticated %}
+                <a href="{% url 'account:create' %}" class="nav-link">회원가입</a>
+                <a href="{% url 'account:login' %}" class="nav-link">로그인</a>
+            {% endif %}
+---------------------이 위까지 복습-------------
+
+강의자료 20페이지
+
+세션관리
+
+세션:작업이 시작되서 종료될 때 까지의 단위.
+
+세션을 요청한 사람이 많으면, 누가 누구인지 구별이 안됨.
+변수가 하나인데, 사용하는 사용자가 여러명일 때?
+
+A가 저장해놓고, B도 저장했으면, A가 보여달라하면 A가 저장한걸 보여줄까 B가 저장한걸 보여줄까?
+해결방법:저장공간을 분리. A의 저장공간, B의 저장공간을 분리.
+
+만드는거 쓰는거는 서버. 쿠키는 저장만.
+세션동안 데이터를 유지하는 방법
+방식 1. 데이터를 클라에 저장:쿠키
+기본 만료기간:웹사이트 끄면 날아감. 문자열만 저장가능. 브라우저별로 크기, 갯수에 대한 제약. 보안상 취약. (개발자도구에서 볼 수 있으니까)
+방식 2. 데이터를 서버에 저장:세션. 보통 한 1년 유지?
+
+http 프로토콜은 다 처음 접속하는거.
+서버가 가진 문서를 제공하는게 목적.
+연결을 잡고있을 필요 없음. 연결 끊어둠. 대신 필요할 떄 줄게:링크
+
+클라1과 서버가 연결했다가 끊으면, 클라가 누구인지 서버가 모름.
+그래서 쿠키로 구분.
+
+서버는 쿠키로
+1. sessionid가 있는지 확인
+2. sessionid가 없으면 저장공간을 생성.
+3. 응답할 때, 저장공간에 sessionid를 보내줌.
+
+다시 연결할때 클라가 서버에 자기의 sessionid를 보내주면서 데이터를 리턴해달라고 요청함.
+다른 클라가 연결하면 서버가 sessionid를 저장해놓고, 클라한테 sessionid를 보냄.
+
+서버는 sessionid를 만들어서 클라이언트와 공유.
+
+---------------------
+강의자료 25p
+HttpRequest.session
+세션값은 딕셔너리로 저장. 
+
+----------------------
+쿠키
+쿠키에서 저장하면, 다른 브라우저로 접속하면 또 투표할 수 있음.
+f12에서 쿠키 삭제하면 또 투표할 수 있음.
+
+----------------------
+p26 static 파일 다루기
+
+static 파일
+- 하드, 정적
+media 파일
+- db에 경로를 저장하고 파일은 파일 스토리지에 저장. 모든 앱을 한군데에 저장.
+
+templates 폴더를 인식 못해서
+config 밑에 settings.py에서 templates 에 폴더를 추가함.
+
+static 파일도 다른 곳에 저장하고 싶으면 설정해야함.
+settings.STATICFILES_DIRS  에 설정한 경로에 둔다.
+
+polls 밑에 static 폴더 생성.
+그 밑에 다시 polls 폴더 생성.
+그 밑에 다시 imgs 폴더 생성.
+여기에 survey.png 넣고.
+
+mypoll/static/imgs 폴더 밑에
+error.png 넣기
+-----------------꽤 중요할듯?--------------------------
+static 파일들을 한군데 다 때려넣기
+config폴더 settings.py로 가서 STATIC_ROOT = BASE_DIR / "static_files" 선언하고
+터미널로 가서
+python manage.py collectstatic
+명령어 실행
+-------------------------------------------
+33p 미디어파일
+-------------------------
+chat_project 어쩌구
+
+uv pip install django
+uv pip install python-dotenv langchain langchain-openai
+python manage.py makemigrations
+python manage.py migrate
+langchain 폴더에서 .env 파일을 root 아래 복사
+
+SSE:클라가 한번 요청하면 서버가 응답을 나눠서 보냄. 양방향이 아님. 스트리밍 방식.
+
+Websocket:대화형.	
+
+SSE
+
+StreamingHttpResponse 에 content_type을 지정. event_stream()은 iterable한 generator임.

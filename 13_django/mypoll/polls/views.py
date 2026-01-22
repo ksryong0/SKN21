@@ -147,7 +147,8 @@ def vote_form(request, question_id):
         print(f"{question_id}의 질문이 없습니다.")
         return render(
             request,
-            "polls/error.html",
+            # "polls/error.html",
+            "error.html",
             {"error_message":f"요청하신 {question_id}번 질문이 없습니다."}
         )
 
@@ -167,19 +168,43 @@ def vote(request):
     choice_id = request.POST.get('choice') # 선택된 보기의 ID
     question_id = request.POST.get('question_id') # 질문 ID
 
+    ######################################
+    # 쿠키(Cookie)를 이용해서 현재 사용자가 이미 투표한 적이 있는 질문이면 투표를 못하게 한다.
+    #  - 쿠키 예제 연습(실제는 DB를 이용해서 처리. 사용자-투표질문번호 테이블이용.)
+    # - 쿠키에 voted_question에 요청한 question_id가 있는지 여부 확인.
+    #   - 있으면 error_message와 함께 투표못한다고 vote_form으로 이동
+    #   - 없으면 투표 처리. -> cookie voted_question에 투표 질문 ID를 추가.
+    ######################################
+    voted_question_ids = request.COOKIES.get('voted_question') #"1,7,10"
+    if voted_question_ids:
+        q_id_list = voted_question_ids.split(",") #["1", "7", "10"]
+        if question_id in q_id_list: # 이미 투표한 질문
+            question = Question.objects.get(pk=question_id)
+            return render(request, 
+                          "polls/vote_form.html", 
+                          {"question":question, "error_message":"이미 투표한 질문입니다."})
+    
+
     # choice_id가 넘어왔다면 choice의 votes를 1 증가
     if choice_id != None:
         selected_choice = Choice.objects.get(pk=choice_id)
         selected_choice.votes += 1
         selected_choice.save()  # update
 
+        #########################################
+        # voted_question Cookie에 투표한 질문 ID 추가
+        
+        voted_question_ids = str(question_id) if not voted_question_ids else f"{voted_question_ids},{question_id}"
+
         # TODO : 업데이트 결과를 보여주는 View를 redirect 방식으로 요청
         # urls.py에 path에 등록된 이름으로 url을 조회
         ## app_name:설정이름
         ## path parameter있는 경우 args=[path parameter값, ..]
         url = reverse("polls:vote_result", args=[question_id]) ## polls 아래에 있는 이름 vote_result를 호출한거임.
-        print(url)
-        return redirect(url)
+        # print(url)
+        response = redirect(url)
+        response.set_cookie("voted_question", voted_question_ids)
+        return response
         # return redirect("/polls/vote_result/"+question_id)
 
         # 결과 페이지 - question 조회
@@ -344,3 +369,15 @@ def vote_create(request):
                 "polls/vote_create_form.html",
                 {"q_form":q_form, "c_formset":c_formset} # 검증 실패한 form들을 전달.
             )
+
+# 설문 질문을 삭제 처리
+# 요청 URL: /polls/vote_delete/삭제할질문_PK
+# View함수: vote_delete
+# 응답 : redirect - polls:list
+@login_required
+def vote_delete(request, question_id):
+    # 삭제할 데이터를 조회
+    question = Question.objects.get(pk=question_id)
+    # 삭제
+    question.delete() # choice도 같이 삭제(CASCADE 설정을 했기 때문에)
+    return redirect("polls:list")
