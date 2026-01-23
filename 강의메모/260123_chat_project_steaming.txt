@@ -1,0 +1,15 @@
+강사님 왈 장고 교재 게시판 만들기 해보면 좋다고 하심.
+
+res=model.invoke(질의)
+{"response":res.content}
+
+res=model.stream(질의)
+for token in res:
+	token
+
+main->generator
+	yield
+일    <-
+다시 -> 첫 yield 뒤부터 다음 yield까지 일함
+반복
+
