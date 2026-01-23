@@ -13,3 +13,98 @@ main->generator
 다시 -> 첫 yield 뒤부터 다음 yield까지 일함
 반복
 
+광명자동차유리복원 베스트원
+글로벌자동차유리
+
+mfa 디바이스 이름 : AWS-SKN21_ryong
+인증 관리자 앱
+다음
+------------------------------
+ec2 서버 생성
+
+t3.medium
+
+새 키 페어 생성
+
+이름 짓고 생성
+
+db는 private 망에 넣음. 외부에서 접속 못하게.
+
+vpc
+서브넷은 public1로
+퍼블릭 IP 자동 할당 활성화
+
+ssh:내가 원격의 컴퓨터를 컨트롤하기 위한 것.
+서버는 ssh 서버가 돌아가고 있어야함
+클라는 ssh 클라로 ssh 서버에 접속.
+ssh는 주로 포트번호 22 사용.
+
+인바운드 규칙 정한거 : 방화벽
+
+스토리지 구성
+30 GiB
+
+public ip는 고정 아이피가 아니고 유동 아이피임.
+------------------------------
+ec2
+연결 버튼 클릭
+ec2인스턴스 연결 탭
+연결버튼 클릭
+
+터미널로 접속됨
+
+처음 설치한 뒤
+apt로 application을 설치하기 전에
+터미널 명령
+
+sudo apt update
+
+sudo apt upgrade
+y
+
+cmd 열기
+ssh-key 디렉토리로 이동
+cd C:\Users\Playdata\Documents\ssh-key 
+
+04.ipynb로 가서
+SSH private key 파일 권한 설정
+로 가서 그대로 따라하기
+
+6번에 추가 누르고
+고급 클릭
+개체유형에서 사용자만 남기고 오케이
+지금찾기 클릭
+playdata(os설치할때 한 계정) 클릭
+확인
+확인
+그럼 playdata만 등록됨
+모든권한에 허용 체크하면 다 허용됨.
+
+적용->확인
+
+--------------------------------------
+윈도우 cmd에서 접속하는 방법
+
+ssh-key 디렉토리로 이동
+위에서 cmd 눌러서 열기
+
+퍼블릭 주소 복사
+터미널에서
+ssh -i my-server-sshkey.pem ubuntu@퍼블릭주소
+ssh -i my-server-sshkey.pem ubuntu@54.180.236.125
+yes
+할거 다했으면 exit 누르면 됨.
+
+aws 사이트에서 네트워크 및 보안 밑에 탄력적 IP 클릭
+탄력적 IP 주소 할당 클릭
+할당 클릭
+
+체크하고 위에 작업 누르고 탄력적 IP 주소 연결 클릭
+인스턴스 선택하고 연결
+
+VPC는 삭제 안해도 비용이 안나감
+
+주말에 EC2 서버 생성을 해보고, 탄력적 IP 적용.
+EC2 서버 생성했으면 apt update, apt upgrade, ssh연결
+
+
