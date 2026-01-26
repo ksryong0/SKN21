@@ -1,10 +1,9 @@
-------------------------------
-ec2 서버 생성 방법
+----------------------------ec2 서버 생성 방법------------------------
 
 EC2 대시보드로 이동
 인스턴스 시작 클릭
 이름 정하고 OS Ubuntu 클릭
-인스턴스 유형 t3.medium 선택
+인스턴스 유형(컴퓨터 사양) t3.medium 선택
 
 새 키 페어 생성
 키 이름 짓고 생성하면 자동 다운로드 됨
@@ -12,22 +11,59 @@ pem 파일 적당한 폴더에 따로 저장
 
 네트워크 설정 탭에서 오른쪽 편집 누르면 
 서브넷이 4개있는데 public1 선택.
-퍼블릭 IP 자동 할당 활성화
+퍼블릭 IP 자동 할당 -> 활성화
 밑에 보안 그룹 규칙 추가하면 프로토콜과 포트, 소스 유형 선택 가능. 소스 유형은 위치 무관 선택.
 
 스토리지 구성 30GiB
 
 오른쪽에 인스턴스 시작
+----------------------탄력적 IP 생성 방법---------------------------
+aws 사이트에서 네트워크 및 보안 밑에 탄력적 IP 클릭
+탄력적 IP 주소 할당 클릭
+할당 클릭
+
+체크하고 위에 작업 누르고 탄력적 IP 주소 연결 클릭
+인스턴스 선택하고 연결
+---------------------VPC생성 방법-----------------------
+VPC 검색해서 이동
+VPC 생성 클릭
+VPC등 클릭
+이름 태그 자동 생성에서 이름 수정
+VPC 생성
+-----------------------ssh private key 파일 권한 설정---------------------------------------
+키 저장된 디렉토리 가서
+키(pem)파일 우클릭
+속성
+보안
+고급
+상속 사용 안함 클릭
+위에거 클릭
+적용
+확인
+
+편집
+그룹 또는 사용자 이름에 있는 것들을 다 제거. 하나씩 눌러서 제거.
+추가
+개체유형
+사용자만 선택하고 나머지는 해제
+고급 클릭
+지금 찾기 클릭
+Playdata(윈도우 접속시 사용하는 계정) 선택
+확인
+확인
+모든 권한 허용 체크
+확인
+확인
+------------------------보안그룹 추가하고 싶을 때-------------------------------
+왼쪽 네트워크 및 보안 아래에 보안 그룹 클릭
+원하는거 체크하고 인바운드 규칙 편집 클릭
+
 -----------아마존 aws에서 ec2 터미널 연결-------------
 왼쪽 인스턴스 아래에 인스턴스 클릭
 원하는 인스턴스에 체크
 오른쪽 위 연결 누르고 아래 연결 클릭
 
 접속되면 터미널에서 명령어 아래와 같이 입력
-sudo apt update
-
-sudo apt upgrade
-y
 ----------윈도우 cmd 터미널로 연결하기------------
 윈도우 cmd에서 접속하는 방법
 
@@ -36,15 +72,69 @@ ssh-key 디렉토리로 이동
 
 아마존 인스턴스에서 퍼블릭 주소 복사
 터미널에서
+ssh -i privatekey경로 계정 ubuntu@퍼블릭주소
 ssh -i my-server-sshkey.pem ubuntu@퍼블릭주소
-ssh -i ryong2.pem ubuntu@13.124.185.190
 ssh -i 만든 pem파일이름.pem ubuntu@13.124.185.190
 yes
+ssh -i mypoll-key.pem ubuntu@3.37.227.19
 할거 다했으면 exit 누르면 됨.
-----------------------탄력적 IP 생성 방법---------------------------
-aws 사이트에서 네트워크 및 보안 밑에 탄력적 IP 클릭
-탄력적 IP 주소 할당 클릭
-할당 클릭
+--------------------------접속 후 실행해야될 명령어----------------
+sudo apt update
 
-체크하고 위에 작업 누르고 탄력적 IP 주소 연결 클릭
-인스턴스 선택하고 연결
+sudo apt upgrade
+y
+-----------------------------터미널 가서--------------------------------------------
+curl -Ls https://astral.sh/uv/install.sh | bash
+
+-----------------------------환경변수 적용 명령어----------------------------
+source ~/.bashrc
+mkdir test_jupyter
+cd test_jupyter
+uv venv .venv --python=3.12
+source .venv/bin/activate
+uv pip install jupyterlab
+jupyter lab --generate-config
+ipython
+from jupyter_server.auth import passwd
+passwd()
+비밀번호 입력 및 확인
+출력으로 나온거 복사(' 포함)
+'argon2:$argon2id$v=19$m=10240,t=10,p=8$HUYoTr9PjQB4/M2ZcahE1g$OraPlMYRh4HvKeiUvAVKHFW0GaBifm5ehidvn+ryz+U'
+exit() 입력
+cd ~/.jupyter
+nano jupyter_lab_config.py
+
+aws 인스턴스의 private 주소를
+c.NotebookApp.ip 에 넣음
+c.NotebookApp.password는 아까 복사한거 붙여넣기.
+
+아래 세개를 복사해서 위에 연 파이썬 파일에서 c=get_config() 밑에 붙여넣기하고 들여쓰기 맞춰줌
+
+c.NotebookApp.ip = '10.0.15.161'
+c.NotebookApp.open_browser = False
+c.NotebookApp.password = 'argon2:$argon2id$v=19$m=10240,t=10,p=8$HUYoTr9PjQB4/M2ZcahE1g$OraPlMYRh4HvKeiUvAVKHFW0GaBifm5ehidvn+ryz+U'
+
+컨트롤 + s 누르고, 컨트롤 + x 누름.
+cd ~/test_jupyter/
+jupyter lab --ip 0.0.0.0
+인스턴스의 public ip의 8888 포트로 접속
+3.37.227.19:8888
+
+password입력해서 접속
+ipykernel 클릭하면 vscode에서처럼 쓸수 있음. 저장해두면 껐다 켜도 유지되어 있음.
+
+끌 때는 컨트롤+c 누르면 됨.
+
+vscode의 extension에서 remote-ssh 설치
+왼쪽 아래 >< 요런 아이콘 클릭
+connect to host... 선택
+ssh 호스트 구성... 클릭
+사용자\.ssh\config 파일 선택
+
+Host EC2-mypoll_server
+    HostName 3.37.227.19
+    User ubuntu
+입력.
+HostName은 인스턴스의 Public IP주소.
+User는 ubuntu 입력.
+
