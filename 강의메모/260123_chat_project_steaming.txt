@@ -131,6 +131,8 @@ mkdir : 디렉토리 생성
 
 cd test_jupyter
 
+git clone 장고프로젝트
+
 가상환경만들기
 uv venv .venv --python=3.12
 
@@ -243,16 +245,18 @@ ls -a : 숨김 파일을 보여줌(리눅스 숨김파일-파일명이 "."으로
 
 vscode ssh로 접속한 상태에서 터미널
 
-uv venv .venv --phyon 3.12
+uv venv .venv --python 3.12
 source .venv/bin/activate
 uv pip install django django-bootstrap5 pillow langchain langchain-openai python-dotenv
+
+sudo apt install -y build-essential pkg-config python3-dev libmariadb-dev libmariadb-dev-compat
 
 python manage.py makemigrations
 python manage.py migrate
 
 개발 서버로 실행
 python manage.py runserver 0.0.0.0:8000
-3.37.227.19:8000
+13.209.219.255:8000
 
 gunicorn?? WSGI 서버?웹어플리케이션 처리를 위한 무언가???
 장고 뷰 실행해줌.
@@ -268,20 +272,23 @@ nginx가 장고한테 시킬일이 있으면 gunicorn을 통해서 실행시키�
 
 gunicorn 설치
 uv pip install django gunicorn
-
-config/settings.py 수정
-
+----------------config/settings.py 수정------------------
 host-서버
 allowed_hosts = 호스트 이름을 뭐로 요청한 애만 허용하겠다. 실제 서비스에서는 등록한 도메인주소를 써둠.
 생략하면 로컬호스트만 허용.
 
+DEBUG = False 설정. True로 하면 에러메세지 볼 수 있음. 보통 개발중에 True로하고 배포시 False로 변경.
+
 SECRET_KEY 도 원래 .env파일에 숨겨놔야됨.
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 STATIC_ROOT 는 static 폴더를 외부로 뺄 거임.
 
+STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/mypoll_chat/static'
+MEDIA_URL = '/media/'
 MEDIA_ROOT = '/var/www/mypoll_chat/media'
-
+-------------------터미널 명령----------------
 STATIC_ROOT/MEDIA_ROOT 디렉토리 생성 + 소유권 변경 + 권한설정
 sudo mkdir -p /var/www/mypoll_chat/static
 sudo mkdir -p /var/www/mypoll_chat/media
@@ -309,8 +316,81 @@ Gunicorn 실행
 gunicorn --bind 0.0.0.0:8000 config.wsgi:application
 http://3.37.227.19:8000/      (퍼블릭IP:8000)
 
+git config user.name ksryong0
+git config user.email ksryong0@gmail.com
+
 장고app을 gunicorn이 실행. gunicorn은 view, template만 실행. static은 실행 안해줌.
 이미지 파일을 받아와야됨.
 static은 nginx가 서비스해야됨.
 gunicorn은 장고만 실행. 뷰 이후만 실행.
 그래서 웹서버 nginx랑 gunicorn을 연결해줘야됨.
+----------------------------1월 27일------------------------------------
+10. Gunicorn을 시스템 서비스 데몬으로 등록(부팅시 자동으로 실행되도록 설정)
+- gunicorn + mypoll_chat application
+- /etc/systemd/system 디렉토리 아래 service 설정파일을 저장.
+ - /etc/systemd/system/mypoll_chat-wsgi.service 파일에 /mypoll_chat/aws_config/wsgi_conf.txt 내용을 저장
+sudo nano /etc/systemd/system/mypoll_chat-wsgi.service 해서
+/mypoll_chat/aws_config/wsgi_conf.txt 내용을 저장
+-----------------
+wsgi_conf.txt : 어떤 프로그램을 실행시켜 에 대한 설정.
+description:설명
+After=network.target : 네트워크가 활성화되면.
+
+ExecStart=/home/ubuntu/mypoll_chat/.venv/bin/gunicorn --workers 3 --bind unix:/run/mypoll_chat/gunicorn.sock config.wsgi:application
+
+/run/mypoll_chat/gunicorn.sock 라는 소켓파일을 실행.
+뷰->nginx가 gunicorn에 요청. 그 때 소켓을 이용해 통신함. 그 소켓을 등록해둠.
+
+RuntimeDirectory:런타임시 해당 디렉토리를 run밑에 만들어라. 이거 안하면 소켓이 안만들어짐.
+RuntimeDirectoryMode : 권한은 755로 설정.
+----------터미널에서------------
+sudo nano /etc/systemd/system/mypoll_chat-wsgi.service
+/mypoll_chat/aws_config/wsgi_conf.txt 에 있는 # 밑에 내용들을 복사해서 붙여넣기.
+컨트롤 s, 컨트롤 x
+
+서비스로 등록(서비스이름 : mypoll_chat-wsgi)
+sudo systemctl start mypoll_chat-wsgi # 서비스 실행
+sudo systemctl enable mypoll_chat-wsgi # 서비스 등록
+sudo systemctl status mypoll_chat-wsgi # 서비스 상태 조회
+q누르면 돌아옴
+
+socket 파일 확인
+ls -l /run/mypoll_chat
+
+Nginx + gunicorn 연동 설정
+- 사용자 요청에 따라서 어떻게 서비스 할지 설정.
+- /static/ ==> STATIC_ROOT 경로 파일을 서비스
+- /media/ ==> MEDIA_ROOT 경로 파일을 서비스
+- 나머지 url요청 => gunicorn 호출
+- nginx 설정파일에 위 내용을 설정 저장
+- /etc/nginx/sites-available/mypoll_chat 파일에 "aws_config/nginx.txt"의 내용을 붙여넣기
+sudo nano /etc/nginx/sites-available/mypoll_chat
+server_name 뒤를 aws public IP로 변경
+
+-------------nginx.txt 파일-------------
+nginx.txt 파일에서 location은
+http://ip/static/js/chat.js
+static url이 들어오면 /var/www/mypoll_chat/static/ 밑에 js/chat.js로 가라는 의미
+media도 같은 원리.
+
+proxy_read_timeout 강제로 끊지말고 이 시간동안은 연결을 보장해줘.
+----------------------------------------
+심볼릭 링크(윈도우에서는 바로가기) 생성+nginx 재시작
+sudo ln /etc/nginx/sites-available/mypoll_chat /etc/nginx/sites-enabled
+ls -l /etc/nginx/sites-enabled
+sudo nginx -t # NGINX 설정파일 검사
+sudo systemctl restart nginx # 시스템 데몬 재시작
+sudo systemctl status nginx # 시스템 데몬 실행상태 확인
+
+----------------------nginx 설정, gunicorn 설정 변경, web application 코드 변경-----------------
+sudo systemctl daemon-reload nginx 또는 mypoll_chat-wsgi
+sudo systemctl restart nginx # nginx 설정 변경시
+sudo systemctl restart mypoll_chat-wsgi # web app 코드 변경, gunicorn 서비스 설정 변경
+sudo systemctl status nginx
+sudo systemctl status mypoll_chat-wsgi
+----------------------------------------------------
+
+
+
+
+
