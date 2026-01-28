@@ -170,9 +170,9 @@ c.NotebookApp.password는 아까 복사한거 붙여넣기.
 
 아래 세개를 복사해서 위에 연 파이썬 파일에서 c=get_config() 밑에 붙여넣기하고 들여쓰기 맞춰줌
 
-c.NotebookApp.ip = '10.0.15.161'
+c.NotebookApp.ip = '10.0.4.222'
 c.NotebookApp.open_browser = False
-c.NotebookApp.password = 'argon2:$argon2id$v=19$m=10240,t=10,p=8$HUYoTr9PjQB4/M2ZcahE1g$OraPlMYRh4HvKeiUvAVKHFW0GaBifm5ehidvn+ryz+U'
+c.NotebookApp.password = 'argon2:$argon2id$v=19$m=10240,t=10,p=8$rCvia2REosVfwA2tkXoYVA$rO1nmYimuvkd16S56SmM/YpPoWAYcS+LNmnhiu6jcsc'
 
 컨트롤 + s 누르고, 컨트롤 + x 누름.
 
@@ -243,7 +243,7 @@ ls -a : 숨김 파일을 보여줌(리눅스 숨김파일-파일명이 "."으로
 
 vscode ssh로 접속한 상태에서 터미널
 
-uv venv .venv --phyon 3.12
+uv venv .venv --python 3.12
 source .venv/bin/activate
 uv pip install django django-bootstrap5 pillow langchain langchain-openai python-dotenv
 
