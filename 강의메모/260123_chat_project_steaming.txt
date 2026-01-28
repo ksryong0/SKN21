@@ -75,7 +75,7 @@ ssh-key 디렉토리로 이동
 터미널에서
 ssh -i my-server-sshkey.pem ubuntu@퍼블릭주소
 ssh -i my-server-sshkey.pem ubuntu@15.165.76.99
-ssh -i ryong.pem ubuntu@15.165.76.99
+ssh -i mypoll.pem ubuntu@3.37.0.153
 yes
 할거 다했으면 exit 누르면 됨.
 
