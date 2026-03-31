@@ -1,0 +1,38 @@
+## 주문 취소 / 반품 / 환불 / 교환 정책
+
+### 주문 상태 정의
+- PENDING: 결제 대기
+- PAID: 결제 완료
+- PREPARING: 상품 준비중
+- SHIPPED: 배송중
+- DELIVERED: 배송 완료
+- CANCELLED: 주문 취소
+- REFUNDED: 환불 완료
+
+### 취소 (cancel_order)
+- 가능: PAID, PREPARING 상태에서만 가능
+- 불가: SHIPPED, DELIVERED, CANCELLED, REFUNDED, PENDING 상태
+- 처리: 즉시 취소, 전액 환불, 재고 자동 복구
+
+### 반품 / 환불 (check_refund_eligibility → register_return_request)
+- 가능: SHIPPED 또는 DELIVERED 상태이면서 배송 완료 후 7일 이내
+- 불가: PAID/PREPARING 상태(→ 취소 안내), DELIVERED 후 7일 초과, CANCELLED/REFUNDED 상태
+- 판매자 귀책(is_seller_fault=True): 전액 환불, 반품 배송비 없음
+- 구매자 귀책(기본): 왕복 배송비(배송비 × 2)를 차감한 금액 환불
+
+### 교환 (check_exchange_eligibility → 분기 처리)
+- 배송 전 (PAID/PREPARING): change_product_option 사용 → 무료 옵션 변경
+- 배송 후 (SHIPPED/DELIVERED, 7일 이내): register_exchange_request 사용 → 왕복 배송비 발생
+- 불가: CANCELLED, REFUNDED 상태, DELIVERED 후 7일 초과
+
+### 상태별 가능 여부 요약
+| 상태             | 취소 | 반품/환불 | 교환 |
+|-----------------|------|----------|------|
+| PENDING          |  ❌  |    ❌    |  ❌  |
+| PAID             |  ✅  |    ❌    |  ✅(무료) |
+| PREPARING        |  ✅  |    ❌    |  ✅(무료) |
+| SHIPPED          |  ❌  |    ✅    |  ✅(유료) |
+| DELIVERED(7일 내)|  ❌  |    ✅    |  ✅(유료) |
+| DELIVERED(7일 초)|  ❌  |    ❌    |  ❌  |
+| CANCELLED        |  ❌  |    ❌    |  ❌  |
+| REFUNDED         |  ❌  |    ❌    |  ❌  |

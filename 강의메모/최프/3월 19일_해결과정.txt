@@ -1,0 +1,131 @@
+order.py 의 order_intent_router의 인텐트 분류 기준별 평가 결과
+100 llm
+80 코드
+80 하이브리드
+qwen 모델 76%
+
+가드레일 이상없는지 확인
+이상한 띄어쓰기도 되는지 확인
+
+1. 
+
+2. 파이썬 코드 매핑
+# 0) 번호 모름 / 목록 요청은 최우선
+    if not has_order_id_pattern and (
+        any(keyword in text for keyword in (
+            "번호몰라", "리스트업", "목록좀", "목록띄워", "내역조회",
+            "주문내역", "주문목록", "주문리스트", "구매내역", "구매목록", "구매리스트",
+            "최근주문", "최근구매", "내주문", "내가산거", "뭐샀", "뭘샀"
+        ))
+        or _is_order_list_intent(text)
+    ):
+        return "list_orders", "high"
+
+    # 1) 명시적 최종 의사 / 부정표현 (A말고B 대응)
+    if any(pattern in text for pattern in (
+        "교환말고취소", "환불말고취소", "반품말고취소", "옵션말고취소",
+        "아니그냥취소", "그냥취소", "취소할게", "취소할래",
+        "취소해주세요", "주문취소해주세요", "결제취소해주세요"
+    )):
+        return "cancel", "high"
+
+    if any(pattern in text for pattern in (
+        "취소말고환불", "교환말고환불", "반품말고환불", "옵션말고환불",
+        "그냥환불", "환불할게", "환불로할게", "반품할게"
+    )):
+        return "refund", "high"
+    
+    if any(pattern in text for pattern in (
+        "취소말고옵션", "환불말고옵션", "교환말고옵션", "반품말고옵션",
+        "그냥옵션변경", "옵션만변경", "사이즈만", "색상만", "옵션만바꿔"
+    )):
+        return "change_option", "high"
+
+    if any(pattern in text for pattern in (
+        "취소말고교환", "환불말고교환", "옵션말고교환",
+        "그냥교환", "교환할게", "교환으로할게"
+    )):
+        return "exchange", "high"
+
+    # 2) 명확한 액션 키워드
+    if any(keyword in text for keyword in (
+        "취소", "주문취소", "결제취소", "철회", "청약철회"
+    )):
+        return "cancel", "high"
+
+    if any(keyword in text for keyword in (
+        "환불", "반품", "반송", "환급", "돈돌려"
+    )):
+        return "refund", "high"
+
+    if (
+        any(keyword in text for keyword in (
+            "배송조회", "택배조회", "배송상태", "배송현황", "배송정보",
+            "송장", "송장번호", "운송장", "운송장번호",
+            "택배사", "현재위치", "지금위치",
+            "언제와", "언제오", "언제도착", "도착예정",
+            "배송어디", "배송어디쯤", "택배어디", "어디쯤"
+        ))
+        or ("배송" in text and any(token in text for token in ("조회", "확인", "상태", "현황", "위치", "언제", "도착", "추적")))
+        or ("택배" in text and any(token in text for token in ("조회", "확인", "상태", "위치", "언제", "도착", "추적")))
+    ):
+        return "shipping", "high"
+
+    if _is_order_list_intent(text) or any(keyword in text for keyword in (
+        "주문내역", "주문목록", "주문리스트",
+        "구매내역", "구매목록", "구매리스트",
+        "최근주문", "최근구매", "내주문", "내가산거", "뭐샀", "뭘샀"
+    )):
+        return "list_orders", "high"
+
+    if any(keyword in text for keyword in (
+        "교환", "교환해", "교환해주세요", "교환요청",
+        "교환접수", "교환하고싶", "맞교환",
+        "교체", "교체해", "교체해주세요"
+    )):
+        return "exchange", "high"
+
+    if any(keyword in text for keyword in (
+        "옵션변경", "옵션만", "사이즈변경", "사이즈만", "색상변경", "색상만", "바꿔줘", "바꿀게", "바꿔주세"
+    )):
+        return "change_option", "high"
+
+    # 3) 사유 기반 추론: low confidence
+    if any(keyword in text for keyword in (
+        "실수", "잘못주문", "잘못시켰", "잘못눌렀",
+        "오주문", "중복주문", "중복결제", "변심",
+        "마음이바뀌", "생각이바뀌",
+        "다른상품으로다시주문", "다른걸로다시주문", "재주문", "다시주문"
+    )):
+        return "cancel", "low"
+
+    if any(keyword in text for keyword in (
+        "불량", "파손", "하자", "오배송", "잘못왔", "다른상품이왔",
+        "상품이다름", "설명과달라", "사진과달라", "고장", "망가", "오염"
+    )):
+        return "refund", "low"
+
+    if any(keyword in text for keyword in (
+        "사이즈가안맞", "사이즈안맞", "너무작", "너무크",
+        "작아요", "커요", "좁아요", "헐거워요", "꽉껴요",
+        "색상이달라", "색상바꾸고싶", "색깔바꾸고싶",
+        "다른사이즈", "다른색상", "다른색", "안맞아"
+    )):
+        return "exchange", "low"
+
+    if any(keyword in text for keyword in (
+        "안와", "안왔", "늦어", "지연", "배송중", "이동중",
+        "조회안됨", "추적안됨", "운송장안뜸", "택배안뜸", "오늘오나"
+    )):
+        return "shipping", "low"
+
+    if any(keyword in text for keyword in (
+        "주문번호모르", "주문번호까먹", "주문번호잊",
+        "최근에산거", "최근에시킨거", "지난번에산거", "그때시킨거"
+    )):
+        return "list_orders", "low"
+
+    if current_action in _ORDER_ACTIONS:
+        return current_action, "low"
+
+    return None, "none"

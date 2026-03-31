@@ -1,0 +1,10 @@
+get_order_ids.py 로 실제 db에 있는 order_id를 조회한 게 맞다면, 
+C:\Users\Playdata\Documents\SKN21_FINAL_5TEAM\SKN21-FINAL-5TEAM\ecommerce\chatbot\chatbot_eval\benchmark\FunctionChat-Bench\data\generate_arg_accuracy_dialog_dataset.py
+에서도 실제 order_id를 조회해서 데이터셋을 만들도록 코드 수정해줘.
+
+평가 시나리오를 위해 seed.py에 db에 넣을 mock data를 만들도록 수정.
+
+id가 왜 random id
+turn_num가 같은게 왜 2개가 있는지?
+
+trun_num가 2, 3

@@ -1,0 +1,79 @@
+1. 배송조회 → shipping_subagent		shipping
+2. 교환 → exchange_subagent			exchange(배송 후), change_option(배송 전)
+3. 환불/반품 → refund_subagent		refund	배송 중 또는 배송 완료된 상품만 가능
+4. 취소 → cancel_subagent			cancel		결제 완료 또는 상품 준비 중 단계 만 가능
+5. 주문내역 조회 → order_list_subagent	get_user_orders
+
+shipping_subagent	, exchange_subagent, refund_subagent, cancel_subagent, order_list_subagent
+
+툴별로 옛날 이름 코드가 있는지 확인 필요할 듯
+shipping
+exchange
+change_option
+refund
+cancel
+get_user_orders (order_list 옛날거로 들어간거 수정)
+
+교환 로직 확인 필요.
+agent는 exchange(배송 후), change_option(배송 전) 라고 하고
+준석님은 exchange로 어떤 옵션으로 교환할건지 확인하고, change_option이 실제로 그 교환 옵션을 실행해주는 애라고 했었는데,
+agent의 말도 일리가 있다고 함.
+
+-----------------
+
+qwen3/qwen3-0.6b 모델에서 평가점수가 궁금.
+어려운 질문 추가.
+
+change_option도 옛날거!
+
+chatbot\src\graph\nodes\order_flow.py
+
+----------------------
+주문번호 없이 취소했는데 get_user_orders가 나와야되는데 cancel이 나오는거 같음.
+C:\Users\Playdata\Documents\SKN21_FINAL_5TEAM\SKN21-FINAL-5TEAM\ecommerce\backend\app\evaluation_adapter.py
+에서 
+if "취소" in user_text:
+                mapped_name = "cancel"
+이 코드가 문제인거같음.
+
+취소, 반품, 환불 요청시에
+주문번호가 있으면 취소, 반품, 환불을 바로 처리해주고
+주문번호가 없으면 주문목록을 조회하는게 맞는지 확인
+
+수정
+---------------------------
+qwen3/qwen3-0.6b 모델에서 평가점수가 궁금.
+
+.env에 VLLM_API_KEY 가 필요한 값인가?
+
+현재위치 알려주세요?
+-----------------------------
+평가 데이터셋 50개로 확장
+쉬운질문, 중간질문, 어려운질문 번호 지정
+시나리오가 md파일을 따르는지 확인
+호출할 툴의 내용은 tools.json을 따르는지 확인
+user_id order_id가 db에 있는 거로 확인
+eval_data.jsonl 파일 참조하는지 확인
+json파일의 형태를 기존 파일과 일치
+-----------------------------
+질문 내용 확장 코드, 우리 챗봇에 적용?
+----------------------------
+Tool_calls를 넣기 위한 방안을 검토해줘
+----------------------------
+# 벤치마크 툴 이름 매핑 (엔진 내부 이름 -> 벤치마크 기대 이름)
+        benchmark_tool_mapping = {
+            "list_orders": "get_user_orders",
+            "get_user_orders": "get_user_orders",
+            "shipping": "shipping",
+            "exchange": "exchange",
+            "refund": "refund",
+            "cancel": "cancel",
+            "change_option": "exchange" # 옵션 변경도 큰 틀에서는 exchange 평가 항목
+        }
+-----------------------------
+가장 큰 문제들
+1. Tool_calls가 없음
+2. 어려운 질문 확장 로직이 적용이 잘 안됨. 질문이 쉬움.
+--------------Tool_calls가 없음--------------------
+
+order_intent_router의 결과를 그대로 평가용 tool name

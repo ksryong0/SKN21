@@ -1,0 +1,135 @@
+def map_user_intent_to_tool(user_text: str, context_hints: Optional[Dict[str, Any]] = None):
+    """
+    order_intent_router용 텍스트 문맥 기반 도구 매핑
+    범위:
+      - cancel (배송 전 취소)
+      - refund (배송 후 환불/반품)
+      - shipping (배송 조회)
+      - get_user_orders (주문내역 조회)
+      - change_option (배송 전 옵션 변경)
+      - exchange (배송 후 교환 접수)
+    """
+    text = normalize_korean_text(user_text)
+    mapped_name = None
+    
+    # 컨텍스트 힌트 추출 (배송 상태 등)
+    order_status = (context_hints or {}).get("status", "").upper()
+    is_delivered = order_status in ["SHIPPED", "DELIVERED", "COMPLETED"]
+    is_pre_delivery = order_status in ["PAID", "PREPARING"]
+
+    # ---------------------------------------------------------
+    # 0단계: 명시적 부정 / 최종 의사 / 우선 해석 (우리 시나리오 최적화)
+    # ---------------------------------------------------------
+    cancel_override_patterns = [
+        "교환말고취소", "환불말고취소", "반품말고취소",
+        "아니그냥취소", "그냥취소", "취소할게", "취소할래",
+        "취소해주세요", "주문취소해주세요", "결제취소해주세요"
+    ]
+    refund_override_patterns = [
+        "취소말고환불", "교환말고환불",
+        "그냥환불", "환불할게", "환불로할게", "반품할게"
+    ]
+    exchange_override_patterns = [
+        "취소말고교환", "환불말고교환",
+        "그냥교환", "교환할게", "교환으로할게"
+    ]
+    change_option_override_patterns = [
+        "교환말고옵션변경", "옵션만바꿀게", "옵션변경할게",
+        "사이즈만바꿀게", "색상만바꿀게"
+    ]
+
+    if any(p in text for p in cancel_override_patterns):
+        return "cancel"
+    if any(p in text for p in refund_override_patterns):
+        return "refund"
+    
+    # 옵션 변경은 교환보다 우선순위를 높여 배송 전 실수를 잡아줌
+    if any(p in text for p in change_option_override_patterns) or (is_pre_delivery and "변경" in text):
+        return "change_option"
+        
+    if any(p in text for p in exchange_override_patterns):
+        return "exchange"
+
+    # ---------------------------------------------------------
+    # 1단계: 명확한 액션 키워드 (시나리오 맞춤형)
+    # ---------------------------------------------------------
+    cancel_action_keywords = [
+        "취소", "주문취소", "결제취소", "취소해", "취소해주세요", "취소부탁",
+        "취소요청", "취소접수", "취소할게", "취소할래"
+    ]
+
+    refund_action_keywords = [
+        "환불", "환불해", "환불해주세요", "반품", "반품해", "반품해주세요",
+        "반품요청", "반품접수", "반품할게", "환불할게", "수거요청"
+    ]
+
+    shipping_action_keywords = [
+        "배송조회", "배송확인", "배송상태", "배송현황", "배송정보", "배송추적",
+        "택배조회", "송장번호", "언제와", "언제도착", "도착예정",
+        "현재위치", "지금위치", "어디쯤", "어디"
+    ]
+
+    order_list_action_keywords = [
+        "주문내역", "주문목록", "주문리스트", "구매내역", "내가산거", "뭐샀",
+        "내역보여", "목록보여", "주문번호모르"
+    ]
+
+    change_option_action_keywords = [
+        "옵션변경", "옵션바꿔", "옵션수정", "사이즈변경", "색상변경",
+        "사이즈바꿔", "색상바꿔", "치수변경", "다른사이즈로바꿔"
+    ]
+
+    exchange_action_keywords = [
+        "교환", "교환해", "교환해주세요", "교환부탁", "교환요청", "교환접수",
+        "교환원해", "교환하고싶", "교환할게", "교체"
+    ]
+
+    # 상태 기반 분기 (가이드라인 준수)
+    if any(k in text for k in cancel_action_keywords):
+        return "cancel"
+
+    if any(k in text for k in refund_action_keywords):
+        return "refund"
+
+    if (
+        any(k in text for k in shipping_action_keywords)
+        or ("배송" in text and any(j in text for j in ["조회", "확인", "상태", "어디", "언제"]))
+    ):
+        return "shipping"
+
+    if any(k in text for k in order_list_action_keywords):
+        return "get_user_orders"
+
+    # 배송 전후에 따른 교환성 도구 분기 핵심
+    if any(k in text for k in change_option_action_keywords):
+        # 텍스트에 옵션 변경 의사가 명확하면 상태와 관계없이 우선 시도
+        return "change_option"
+
+    if any(k in text for k in exchange_action_keywords):
+        if is_pre_delivery:
+            return "change_option"
+        return "exchange"
+
+    # ---------------------------------------------------------
+    # 2단계: 사유/상황 기반 보조 추론
+    # ---------------------------------------------------------
+    if not mapped_name:
+        if any(k in text for k in ["실수", "잘못주문", "변심", "다시주문"]):
+            mapped_name = "cancel"
+
+        elif any(k in text for k in ["하자", "불량", "파손", "고장", "오배송"]):
+            mapped_name = "refund"
+
+        elif any(k in text for k in ["안와", "늦어", "지연", "지금어디"]):
+            mapped_name = "shipping"
+
+        elif any(k in text for k in ["내가뭘샀", "최근에산거", "주문번호까먹"]):
+            mapped_name = "get_user_orders"
+
+        elif any(k in text for k in ["사이즈안맞", "색상바꾸고싶", "치수바꾸고싶"]):
+            if is_pre_delivery:
+                mapped_name = "change_option"
+            else:
+                mapped_name = "exchange"
+
+    return mapped_name

@@ -1,0 +1,55 @@
+1. generate_arg_accuracy_dialog_dataset3.py
+현재 이 코드(generate_arg_accuracy_dialog_dataset3.py)는 평가용 데이터셋을 만드는 코드야. 하지만 데이터셋을 만들 때는 user_id와 user_email를 한가지만 사용해서 만들고 있어.
+현재는 시나리오별로 eval_data.jsonl 에 정의된 order_number에 따라서 질문 데이터셋을 만들고 있어. 하지만 한가지 user_id와 user_email로 질문 데이터셋을 만들고 있어. 내가 원하는건 user_id가 3까지 있으면
+user_id가 1일 때의 user_email과 각각의 시나리오에 따른 질문 데이터셋
+user_id가 2일 때의 user_email과 각각의 시나리오에 따른 질문 데이터셋
+user_id가 3일 때의 user_email과 각각의 시나리오에 따른 질문 데이터셋
+이런 식으로 데이터셋을 만드는거야. 코드 수정해줘.
+---------------------------
+@beautifulMention 가 @beautifulMention 를 참고했으면 test3@example.com 에서는 ORD-eval_dataset-001이 아니고 ORD-eval_dataset-007을 참고해야돼. 확인해서 수정해줘.
+
+2. 질문, 답변 코드를 분리
+
+generate_arg_accuracy_dialog_dataset3.py
+현재 이 코드는 질문과 대답 쌍을 한번에 생성해주잖아. 질문을 먼저 생성하고, 내가 입력을 넣으면 결과가 나오게 할 수 있게 코드 두개로 분리해줘.
+data 에 저장해줘
+3. 이름이 sample로 들어감 버그 수정
+
+4. llm 이 질문이 적당한지 평가하는 코드 작성
+당신은 이커머스 에이전트 챗봇의 Argument Accuracy 평가 데이터셋 검수자입니다.
+
+입력으로 주어진 질문이 평가용 질문으로 적절한지 검토하세요.
+
+검토 기준:
+1. 질문만 보고 사용자의 의도(intent)가 명확해야 합니다.
+2. 이번 시나리오에서 필요한 필수 인자가 질문 안에 실제로 포함되어 있어야 합니다.
+3. 질문은 실제 사용자가 말할 법한 자연스러운 한국어여야 합니다.
+4. 내부 tool 이름(function name)이 직접 드러나면 안 됩니다.
+5. JSON, 함수호출 형태, 지나치게 인위적인 문장은 부적절합니다.
+6. 질문이 너무 모호해서 여러 tool로 해석될 수 있으면 FAIL입니다.
+
+출력 형식은 반드시 아래 JSON만 반환하세요.
+
+{
+  "verdict": "PASS 또는 FAIL",
+  "intent_clear": true,
+  "required_arguments_present": true,
+  "natural_utterance": true,
+  "tool_leakage": false,
+  "issues": ["문제점1", "문제점2"],
+  "revised_question": "수정된 질문 또는 원문"
+}
+5. 질문 확인
+6. 답변 생성 코드 실행
+7. 답변 받기
+8. 그래도 낮으면 평가 프롬프트 수정사항 확인
+
+------------------------
+
+프롬프트 미적용
+
+my_eval_queries_v3.json 의 질문 내용을 my_eval_arg_accuracy_dialogs2.jsonl 으로 수정해줘.
+
+my_eval_arg_accuracy_dialogs3.jsonl 의 데이터 포맷이 my_eval_arg_accuracy_dialogs2.jsonl 처럼 되도록 generate_dataset_v3.py 코드 수정해줘.
+----------------------------
+문구가 많아지면 환불신청을 바로 안하는 경우가 있네요.

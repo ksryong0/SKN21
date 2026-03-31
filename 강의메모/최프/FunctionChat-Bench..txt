@@ -1,0 +1,450 @@
+FunctionChat-Bench.
+
+agent한테 시킬 때 테스트 갯수 줄여서 테스트. 1000개에서 500개로 줄여서 테스트함. 더 줄여도 될듯.
+
+서버 실행 명령 후, update_order_ids.py 에서 오더번호 업데이트하고, 
+generate_100_cases.py 에서 서버에 있는 오더번호 참고하도록 수정하고, 
+my_eval_dataset_100.jsonl 도 서버에 있는 오더번호 참고하도록 수정하고, 
+evaluate.py 에서 기존 my_eval_dataset*.jsonl 관련참고한 코드를 my_eval_dataset_100_updated.jsonl를 참고하도록 수정. 
+
+**"프롬프트에 고퀄리티 도구 호출 예시(few-shot samples)"**를 추가해 보시는 것을 먼저 추천
+
+SingleCall vs Dialog vs MultiTool
+-----------------
+2. Few-shot 예시 추가 (System Prompt 보완)
+모델이 복잡한 의도를 가진 질문에서 도구를 헷갈려한다면, 시스템 프롬프트에 성공적인 도구 호출 예시를 3~5개 포함하세요.
+
+특히 "단순 변심으로 인한 환불"과 같이 여러 단계가 필요한 경우, 어떤 도구를 우선적으로 선택해야 하는지 예시(check_refund_eligibility)를 보여주면 성능이 비약적으로 향상됩니다.
+3. 추출 로직 및 상태 관리(State Management) 개선
+Default 파라미터 활용: 현재 
+user_id
+를 항상 1로 가정하고 있다면, 실제 환경에서는 세션이나 인증 정보에서 
+user_id
+를 자동으로 주입하는 로직을 LangGraph 노드에 추가하여 모델의 부담을 줄여주세요.
+Contextual Tool Selection: 이전 대화 맥락에서 특정 주문 번호를 언급했다면, 다음 질문에서 주문 번호를 생략하더라도 AgentState에 저장된 정보를 참고해 도구를 호출할 수 있도록 로직을 강화하세요.
+4. 도구 호출 실패에 대한 자가 수정(Self-Correction) 루프
+LangGraph의 장점을 활용하여, 잘못된 도구를 호출하거나 필수 파라미터가 빠졌을 때 바로 사용자에게 묻는 대신 반성(Reflection) 노드를 추가해 보세요.
+
+예: 도구 호출 결과가 에러이거나 값이 비어있다면, LLM에게 "방금 호출이 실패했는데, 파라미터가 정확한지 다시 확인해서 재시도해줘"라고 요청하는 순환 구조를 만듭니다.
+5. 평가 데이터셋의 다양성 확보 (Negative Sampling)
+현재 100개의 케이스 외에도 챗봇이 도구를 호출하지 않아야 할 상황을 더 많이 추가하세요.
+
+일상 대화: "오늘 기분 어때?" 같은 질문에는 no_tool_call이 발생하도록 학습/프롬프팅을 강화하여 '과잉 호출(Over-triggering)'을 방지해야 합니다.
+모호한 질문: "이거 취소해줘"라고만 했을 때, 어떤 주문인지 물어보는 fallback 로직이 제대로 작동하는지 평가 항목에 넣으세요.
+---------------------------
+1. 
+exact
+를 선택한 이유
+평가 데이터셋(
+my_eval_dataset_100_updated.jsonl
+)의 구조를 보면, 하나의 테스트 케이스 안에 여러 가지 스타일의 도구 셋이 포함되어 있습니다.
+
+exact
+: 해당 질문을 해결하는 데 꼭 필요한 도구만 AI에게 보여줍니다. (난이도: 하)
+4_random / 8_random: 필요한 도구 + 관련 없는 무작위 도구를 섞어서 보여줍니다. (난이도: 중)
+4_close / 8_close: 필요한 도구 + 비슷하게 생긴 헷갈리는 도구를 섞어서 보여줍니다. (난이도: 상)
+현재 우리는 개선된 시스템 프롬프트가 도구를 정확히 호출하는지를 가장 먼저 확인해야 하므로, 우선 가장 노이즈가 적은 
+exact
+ 모드로 베이스라인 점수를 확인하려 한 것입니다.
+
+
+2. 다른 옵션과의 차이점
+만약 tools_type을 
+all
+로 설정하면, 데이터셋에 들어있는 모든 조합(
+exact
+, 4_random, 8_close 등)에 대해 평가가 중복 실행되어 시간이 훨씬 오래 걸리게 됩니다.
+
+3. 추천 시나리오
+지금 (
+exact
+): 프롬프트 개선 후, 기본 도구 선택 능력이 정상인지 확인
+다음 단계 (8_close): AI가 수많은 도구들 사이에서 얼마나 잘 구분해내는지(할루시네이션 방지 능력) 테스트
+현재 GPT-3.5로 
+exact
+ 테스트가 진행 중이며, 이 결과에서 90점 이상의 높은 점수가 나오면 그때 8_close 같은 더 어려운 모드에 도전해 보시는 것을 추천드립니다!
+--------------------
+evaluate.py 실행시 --reset True --temperature 0.0 의미 피악
+
+서버, 클라 실행 명령어
+
+상대경로, 절대경로 모듈화
+
+ORD-20260225 를 ORD-20260219로 수정.
+
+my_eval_dataset_100_updated.jsonl 가 AI_Hub의 데이터셋도 참고해서 만들어진거야?
+의류_validation.csv 과 패션_validation.csv 모두 참고한거야?
+
+우리는 우리 챗봇의 정량적 평가를 위해 FunctionChat-Bench 뿐만 아니라 다른 벤치들도 사용해서 지표들을 평가할거야. 이를 고려해서 
+output 최신만 남겨줘.
+
+my_eval_dataset_100_updated.jsonl 이 generate_100_cases.py 으로부터 생성되는지?
+
+제발 좀 api_key 좀 노출되지 않게 해줄래? 앞으로도 노출되지 않게 해줘. 노출되면 죽는다.
+
+우리는 이커머스 액션 기반 챗봇 프로젝트를 진행하고 있어. 사용자의 질문에 상담만 해주는게 아니고 실제로 교환 및 환불도 해주는 에이전트 챗봇이야. 우리 챗봇의 툴들은 다음과 같아.
+get_order_details, get_shipping_details, update_payment_method, change_product_option, cancel_order, check_refund_eligibility,  check_exchange_eligibility, register_return_request, register_exchange_request, get_reviews, create_review, register_gift_card, search_knowledge_base, open_address_search, save_shipping_address_from_ui.
+그리고 Argument Accuracy 를 평가하기 위해 FunctionChat-Bench를 사용할거야. 우리는 자체적으로 무신사 faq 데이터셋과 전자상거래표준약관 데이터셋이 있어. 우리 챗봇에 이 데이터셋으로 질문해서 답변한 질문-답변 쌍과 ai_hub 라는 공공기관의 패션.csv 파일, 의류.csv 파일을 이용해서, 테스트를 위한 데이터셋을 5개만 만들고 싶어. 어떻게 만들면 될까?
+------------------------------
+주의
+FunctionChat-Bench 실제 테스트 시에는 데이터셋을 200개로 만들고, evaluate 파이프라인 돌릴 때에도 파이프라인 파이썬 파일과 handler 파일 에서 200개로 테스트하고, num_samples도 200개로 테스트 하도록 수정해야함.
+1. gpt한테 질문
+1-1. Singlecall
+우리는 이커머스 액션 기반 챗봇 프로젝트를 진행하고 있어. 사용자의 질문에 상담만 해주는게 아니고 실제로 교환 및 환불도 해주는 에이전트 챗봇이야. 우리 챗봇의 툴들은 다음과 같아.
+get_order_details, get_shipping_details, update_payment_method, change_product_option, cancel_order, check_refund_eligibility,  check_exchange_eligibility, register_return_request, register_exchange_request, get_reviews, create_review, register_gift_card, search_knowledge_base, open_address_search, save_shipping_address_from_ui.
+그리고 Argument Accuracy 를 평가하기 위해 FunctionChat-Bench를 사용할거야. 우리는 자체적으로 무신사 faq 데이터셋과 전자상거래표준약관 데이터셋이 있어. 우리 챗봇에 이 데이터셋으로 질문해서 답변한 질문-답변 쌍과 ai_hub 라는 공공기관의 패션.csv 파일, 의류.csv 파일을 이용해서, 테스트를 위한 데이터셋을 5개만 만들고 싶어. 어떻게 만들면 될까?
+1-2. Dialog
+우리는 이커머스 액션 기반 챗봇 프로젝트를 진행하고 있어. 사용자의 질문에 상담만 해주는게 아니고 실제로 교환 및 환불도 해주는 에이전트 챗봇이야. 우리 챗봇의 툴들은 다음과 같아. get_order_details, get_shipping_details, update_payment_method, change_product_option, cancel_order, check_refund_eligibility, check_exchange_eligibility, register_return_request, register_exchange_request, get_reviews, create_review, register_gift_card, search_knowledge_base, open_address_search, save_shipping_address_from_ui. 그리고 Slot Filling Rate 를 평가하기 위해 FunctionChat-Bench의 Dialog를 사용할거야. 우리는 자체적으로 무신사 faq 데이터셋과 전자상거래표준약관 데이터셋이 있어. 우리 챗봇에 이 데이터셋으로 질문해서 답변한 질문-답변 쌍과 ai_hub 라는 공공기관의 패션.csv 파일, 의류.csv 파일을 이용해서, 테스트를 위한 데이터셋을 5개만 만들고 싶어. 어떻게 만들면 될까?
+
+2. agent한테 클로드 sonnet 모드로 데이터셋 만들어달라고 시키기.
+2-1. SingleCall
+우리는 이커머스 액션 기반 챗봇 프로젝트를 진행하고 있어. 사용자의 질문에 상담만 해주는게 아니고 실제로 교환 및 환불도 해주는 에이전트 챗봇이야. 우리 챗봇의 툴들은 다음과 같아. get_order_details, get_shipping_details, update_payment_method, change_product_option, cancel_order, check_refund_eligibility, check_exchange_eligibility, register_return_request, register_exchange_request, get_reviews, create_review, register_gift_card, search_knowledge_base, open_address_search, save_shipping_address_from_ui. 그리고 Argument Accuracy 를 평가하기 위해 
+
+FunctionChat-Bench
+ 를 사용할거야. 우리는 자체적으로 무신사 faq 데이터셋(
+
+musinsa_faq_20260203_162139_final.json
+ )과 전자상거래표준약관 데이터셋( 
+
+ecommerce_standard_preprocessed.json
+   )이 있어. 우리 챗봇에 이 데이터셋으로 질문해서 답변한 질문-답변 쌍과 ai_hub 라는 공공기관의 패션.csv 파일 ( 
+
+패션_validation.csv
+  ), 의류.csv 파일 (  
+
+의류_validation.csv
+  )을 이용해서, 테스트를 위한 데이터셋을 5개만 만들어줘. order 넘버가 필요하면 오늘날짜말고 ORD-20260219 로 시작하게 해줘. 데이터셋을 만들기 위한 .py 파일과 .jsonl 파일은
+
+data
+에 저장해줘. 해당 작업은 아래 방침을 참고해서 만들어줘.
+1) 데이터 소스별로 역할 정리
+A. 무신사 FAQ Q-A 쌍
+
+장점: 실제 사용자 말투/상황이 많음
+
+활용: “배송조회/반품/교환/환불/리뷰/쿠폰·기프트카드” 같은 행동 유도형 질문 템플릿 뽑기
+
+B. 전자상거래 표준약관
+
+장점: 환불·청약철회·교환 불가 사유 같은 정책 조건이 명확
+
+활용: **eligibility 판단(check_refund_eligibility / check_exchange_eligibility)**이 필요한 질문 만들기
+
+“단순변심/훼손/사용흔적/라벨 제거/기간 경과” 같은 조건을 질문에 넣어서 모델이 인자를 잘 뽑는지 확인
+
+C. AI Hub 패션.csv / 의류.csv
+
+장점: 상품명/옵션(색상·사이즈)/카테고리/브랜드/소재 같은 구조화된 슬롯이 있음
+
+활용: 옵션 변경(change_product_option), 리뷰(get_reviews/create_review) 같은 “상품 단위” 인자를 자연스럽게 만들기
+
+2) 5개를 만들기 위한 “초간단 파이프라인”
+Step 1) 툴별 필수 인자(슬롯)부터 정의 (너희 내부 스펙 기준)
+
+FunctionChat-Bench의 Argument Accuracy는 결국 “정답 인자”가 있어야 하니까, 각 툴에 대해 최소 슬롯을 정해두면 좋아.
+
+예시(너희가 흔히 쓰는 형태로 가정):
+
+get_order_details: order_id
+
+get_shipping_details: order_id (또는 tracking_no)
+
+update_payment_method: order_id, payment_method
+
+change_product_option: order_id, item_id(or product_id), option (color/size)
+
+cancel_order: order_id, reason
+
+check_refund_eligibility: order_id, reason, condition(미개봉/사용여부), received_date
+
+check_exchange_eligibility: order_id, reason, 원하는 옵션
+
+register_return_request: order_id, items, pickup_address_id(or address), reason
+
+register_exchange_request: order_id, items, new_option, reason
+
+get_reviews: product_id
+
+create_review: order_id, product_id, rating, text
+
+register_gift_card: gift_card_code
+
+search_knowledge_base: query
+
+open_address_search: (UI 호출 트리거라 인자 없을 수도)
+
+save_shipping_address_from_ui: address_id(or address payload)
+
+핵심: 5개만 만들 거면, 슬롯이 명확한 툴 위주로 고르는 게 좋아.
+
+Step 2) “현실적인 사용자 질문” 템플릿 5개 고르기
+
+5개면 아래 조합이 딱 좋아(툴 다양성 + 인자 난이도 확보):
+
+환불 가능 여부 확인(약관 기반) → check_refund_eligibility
+
+교환 신청(옵션 변경 포함, 상품 CSV 활용) → register_exchange_request
+
+반품 신청 + 수거 주소(UI 플로우 포함) → open_address_search + save_shipping_address_from_ui + register_return_request
+
+결제수단 변경(간단하지만 인자 확실) → update_payment_method
+
+리뷰 작성(상품 CSV로 product_id/상품명 연결) → create_review
+
+Step 3) AI Hub CSV에서 “상품 1~2개”만 뽑아 슬롯 채우기
+
+패션.csv/의류.csv에서 아무 상품 1개를 골라:
+
+상품명, 브랜드, 카테고리, 옵션(색상/사이즈)이 있으면 베스트
+
+그걸 질문에 자연스럽게 녹여서 “사람이 말하는 문장”으로 만든다.
+
+Step 4) 주문/주문항목/주소 같은 “테스트용 더미 ID”를 고정
+
+FunctionChat-Bench는 정답 인자가 필요하니 5개는 그냥 고정해도 돼.
+
+order_id: ORD-20260225-0001 같은 형태로 통일
+
+item_id/product_id: P-000123 같은 형태
+
+주소 UI에서 선택된 address_id: ADDR-0007
+
+기프트카드 코드 같은 건 이번 5개에선 제외(너무 단발)
+
+Step 5) JSONL로 저장 (각 라인이 1개 샘플)
+
+너희가 이미 쓰는 형식(시나리오/툴/유저쿼리/세션/expected_result 등)에 맞춰서 5개를 뽑아내면 끝.
+
+3) 바로 가져다 쓸 수 있는 “샘플 5개” (FunctionChat-Bench 스타일 JSONL)
+
+아래는 Argument Accuracy 평가용으로, 질문 안에 필요한 슬롯이 들어가게 만든 예시야.
+(※ order_id/product_id 등은 너희 테스트 더미로 바꿔도 됨)
+
+{"scenario_id":"ECOM_ARG_001","tool_name":"check_refund_eligibility","user_query":"[check_refund_eligibility] ORD-20260225-0001 주문 환불 가능한지 확인해줘. 어제(2026-02-24) 받았는데 사이즈가 생각보다 작아서 단순변심 환불하고 싶어. 택도 안 뜯었어.","session_state":"logged_in","expected_result":"allow","risk_type":"policy_boundary"}
+{"scenario_id":"ECOM_ARG_002","tool_name":"register_exchange_request","user_query":"[register_exchange_request] ORD-20260225-0002에서 '오프화이트 후드티'(상품 P-000123) 교환 신청할래. 지금은 블랙/M인데 블랙/L로 바꾸고 싶어. 포장만 뜯었고 착용은 안 했어.","session_state":"logged_in","expected_result":"allow","risk_type":"option_change"}
+{"scenario_id":"ECOM_ARG_003","tool_name":"register_return_request","user_query":"[register_return_request] ORD-20260225-0003 반품 신청해줘. 신발(상품 P-000777) 색상이 화면이랑 달라. 수거 주소는 새로 입력할게.","session_state":"logged_in","expected_result":"needs_address_ui","risk_type":"ui_flow"}
+{"scenario_id":"ECOM_ARG_004","tool_name":"update_payment_method","user_query":"[update_payment_method] ORD-20260225-0004 결제수단을 '카드'로 바꿔줘. 지금은 계좌이체로 되어 있어.","session_state":"logged_in","expected_result":"allow","risk_type":"payment_change"}
+{"scenario_id":"ECOM_ARG_005","tool_name":"create_review","user_query":"[create_review] ORD-20260225-0005에 있는 상품 P-000321 리뷰 남길래. 별점 5점! \"배송 빠르고 핏이 예뻐요. 봄에 입기 딱 좋네요\" 이렇게 작성해줘.","session_state":"logged_in","expected_result":"allow","risk_type":"ugc_write"}
+
+001: 약관 조건(단순변심/수령일/미개봉)을 질문에 포함 → eligibility 인자 추출 평가 좋음
+
+002: 교환 신청 + 옵션(색/사이즈) 명시 → new_option 추출 평가에 최적
+
+003: 반품 신청인데 “주소 새로 입력” → 실제 에이전트라면 open_address_search → save_shipping_address_from_ui 이후 register_return_request로 이어지는지(혹은 expected_result로 상태를 두는지) 설계 가능
+
+004: 결제수단 변경 → 인자 깔끔해서 정확도 측정 기준점 역할
+
+005: 리뷰 생성 → rating/text/product_id 추출 확인
+
+4) 너희 데이터셋(FAQ/약관/CSV)을 “진짜로 섞는” 최소 규칙 3개
+
+FAQ에서 ‘질문 스타일’을 가져오고, 약관에서 조건 문구를 끼워 넣기
+
+예: “단순변심인데 가능해?” + “수령 후 7일” + “사용 흔적 없음” 같은 문장 조합
+
+CSV는 ‘상품 엔티티 슬롯’만 제공하는 용도로 쓰기
+
+상품명/옵션을 질문에 자연스럽게 삽입 → product_id는 정답 라벨로만 유지(유저가 말 안 하게 만들어도 됨)
+
+5개만 만들 땐, 난이도 스펙트럼을 일부러 넣기
+
+쉬움(결제수단 변경) 1개
+
+중간(리뷰/교환) 2개
+
+어려움(UI 플로우/약관 경계) 2개
+
+2-2. Dialog
+우리는 이커머스 액션 기반 챗봇 프로젝트를 진행하고 있어. 사용자의 질문에 상담만 해주는게 아니고 실제로 교환 및 환불도 해주는 에이전트 챗봇이야. 우리 챗봇의 툴들은 다음과 같아. get_order_details, get_shipping_details, update_payment_method, change_product_option, cancel_order, check_refund_eligibility, check_exchange_eligibility, register_return_request, register_exchange_request, get_reviews, create_review, register_gift_card, search_knowledge_base, open_address_search, save_shipping_address_from_ui. 그리고 Slot Filling Rate 를 평가하기 위해 FunctionChat-Bench의 Dialog를 사용할거야. 우리는 자체적으로 무신사 faq 데이터셋( 
+
+musinsa_faq_20260203_162139_final.json
+ )과 전자상거래표준약관 데이터셋(
+
+ecommerce_standard_preprocessed.json
+)이 있어. 우리 챗봇에 이 데이터셋으로 질문해서 답변한 질문-답변 쌍과 ai_hub 라는 공공기관의 패션.csv 파일 ( 
+
+패션_validation.csv
+ ), 의류.csv 파일 ( 
+
+의류_validation.csv
+ )을 이용해서, 테스트를 위한 데이터셋을 5개만 만들어줘. order 넘버가 필요하면 오늘날짜말고 ORD-20260219 로 시작하게 해줘. 데이터셋을 만들기 위한 .py 파일과 .jsonl 파일은
+
+data
+ 에 저장해줘. 파이썬 파일명은 generate_slot_filling_rate_dialog_dataset.py 로 저장해줘. jsonl 파일은 my_eval_slot_filling_rate_dialog_5.jsonl로 저장해줘. 해당 작업은 아래 방침을 참고해서 만들어줘.
+아래 방식으로 **“Slot Filling Rate(누락 슬롯을 대화로 채워서 올바른 툴 호출까지 가는 능력)”**에 딱 맞는 FunctionChat-Bench Dialog용 테스트셋 5개를 만들 수 있어요. 핵심은 1) 첫 사용자 발화에 일부 슬롯을 일부러 비워두고, 2) 챗봇이 추가 질문으로 슬롯을 수집한 뒤, 3) 올바른 툴+인자로 호출하도록 설계하는 겁니다.
+
+1) 5개만 만들 때 가장 쉬운 제작 프로세스
+A. “슬롯 사전” 먼저 고정하기 (툴별 필수 슬롯)
+
+각 툴에서 필수 인자(슬롯) 를 정해두면, Dialog 시나리오를 만들 때 “일부러 뭘 빼야 하는지”가 명확해져요.
+
+예시(권장 필수 슬롯 가이드):
+
+get_order_details(order_id)
+
+get_shipping_details(order_id)
+
+update_payment_method(order_id, payment_method)
+
+change_product_option(order_id, item_id, option_after)
+
+cancel_order(order_id, reason)
+
+check_refund_eligibility(order_id) (+ 경우에 따라 item_id)
+
+check_exchange_eligibility(order_id, item_id, option_after)
+
+register_return_request(order_id, item_id, reason, pickup_address)
+
+register_exchange_request(order_id, item_id, option_after, pickup_address)
+
+create_review(order_id, item_id, rating, text)
+
+register_gift_card(code)
+
+search_knowledge_base(query)
+
+open_address_search(keyword) → save_shipping_address_from_ui(address_id)
+
+B. 데이터 소스 매핑(어떤 데이터로 “현실감”을 줄지)
+
+무신사 FAQ / 전자상거래표준약관: “규정/정책” 근거가 필요한 문장(예: 단순변심, 훼손, 청약철회 예외, 배송완료 후 기간 등)으로 시나리오 문맥을 만듦.
+
+AIHub 패션.csv / 의류.csv: “상품 속성(색상, 사이즈, 소재, 카테고리)”을 활용해 옵션 변경/교환/리뷰 시나리오를 자연스럽게 만듦.
+
+C. 5개 구성은 “서로 다른 슬롯 패턴”으로
+
+Slot Filling Rate를 잘 보려면, 5개가 전부 “주문번호 물어보기”만 하면 안 돼요.
+
+(1) 주문번호 누락
+
+(2) 아이템/옵션 누락
+
+(3) 주소 누락(주소 검색 → 저장)
+
+(4) 결제수단 값 누락
+
+(5) 규정 문의(툴 호출 여부 결정 + 필요한 추가 질문)
+
+2) FunctionChat-Bench Dialog 샘플 5개 (바로 복사해서 쓰기 좋게)
+
+아래는 “대화 턴”과 “정답 흐름(기대 툴 호출)”이 포함된 미니 골든셋 예시입니다.
+(실제 벤치 포맷이 약간 다를 수 있어서, 너희가 쓰는 Dialog JSON 스키마에 맞춰 turns 배열 + expected_calls 형태로만 유지해도 충분히 변환 가능합니다.)
+
+Dataset #1: 교환 가능 여부 → 누락 슬롯: 주문번호, 교환옵션
+
+목표 평가: check_exchange_eligibility를 위해 order_id / item / option_after를 슬롯필링으로 수집
+
+user(1): “후드티 사이즈가 작아요. 교환 가능한지 확인해줘요.”
+
+assistant(1): “교환 가능 여부 확인하려면 주문번호와 어떤 상품(색상/사이즈), 바꾸고 싶은 사이즈를 알려주세요.”
+
+user(2): “주문번호 20260225-001 이고, 블랙 M을 L로 바꾸고 싶어요.”
+
+assistant(2): (툴 호출) check_exchange_eligibility(order_id=..., item_id(or item_desc)=..., option_after=...)
+
+expected tool call
+
+tool: check_exchange_eligibility
+
+args: { "order_id": "20260225-001", "item": "후드티 블랙 M", "option_after": "블랙 L" }
+
+Dataset #2: 반품 신청 → 누락 슬롯: 주문번호, 수거주소(주소검색 플로우 포함)
+
+목표 평가: open_address_search → save_shipping_address_from_ui → register_return_request
+
+user(1): “받아보니 생각보다 얇아서 반품하고 싶어요.”
+
+assistant(1): “반품 신청을 도와드릴게요. 주문번호와 반품할 상품을 알려주세요.”
+
+user(2): “주문번호 20260220-778, ‘코튼 셔츠 아이보리 S’요.”
+
+assistant(2): “수거 주소가 어디인지 확인이 필요해요. 도로명/건물명으로 검색할 키워드를 알려주세요.”
+
+user(3): “서울 강남구 테헤란로 123”
+
+assistant(3): (툴) open_address_search(keyword="서울 강남구 테헤란로 123")
+
+assistant(4): “검색 결과 중 선택해주세요: (UI에서 address_id 선택 유도)”
+
+user(4): “첫 번째요.” (UI 선택값이 address_id로 들어온다고 가정)
+
+assistant(5): (툴) save_shipping_address_from_ui(address_id="ADDR-001")
+
+assistant(6): (툴) register_return_request(order_id="20260220-778", item="코튼 셔츠 아이보리 S", reason="단순변심/두께 불만", pickup_address="ADDR-001")
+
+expected tool calls(순서 중요)
+
+open_address_search
+
+save_shipping_address_from_ui
+
+register_return_request
+
+Dataset #3: 결제수단 변경 → 누락 슬롯: 주문번호, 변경할 결제수단
+
+목표 평가: update_payment_method 슬롯필링
+
+user(1): “결제수단을 바꾸고 싶어요.”
+
+assistant(1): “어떤 주문의 결제수단을 어떤 방식으로 변경할까요? 주문번호와 변경할 결제수단(카드/계좌이체 등)을 알려주세요.”
+
+user(2): “주문번호 20260225-119, 카드로 변경해주세요.”
+
+assistant(2): (툴) update_payment_method(order_id="20260225-119", payment_method="card")
+
+expected tool call
+
+tool: update_payment_method
+
+args: { "order_id": "20260225-119", "payment_method": "card" }
+
+Dataset #4: 주문 취소 → 누락 슬롯: 주문번호, 취소 사유(정형/자유 텍스트)
+
+목표 평가: cancel_order에 필요한 슬롯(사유 포함) 수집
+
+user(1): “주문 취소할래요.”
+
+assistant(1): “취소할 주문번호와 취소 사유를 알려주세요.”
+
+user(2): “20260224-555 / 다른 색으로 다시 주문하려고요.”
+
+assistant(2): (툴) cancel_order(order_id="20260224-555", reason="다른 색으로 재주문")
+
+expected tool call
+
+tool: cancel_order
+
+args: { "order_id": "20260224-555", "reason": "다른 색으로 재주문" }
+
+Dataset #5: 환불 규정 문의(툴 호출 vs KB) + 누락 슬롯: “정책 질문”을 구체화
+
+목표 평가: 단순 상담이 아니라 검색 기반 안내로 슬롯(상황 정보)을 추가로 물어본 뒤 search_knowledge_base로 연결
+(무신사 FAQ/약관 문장 기반으로 질문을 구성하면 좋아요)
+
+user(1): “단순변심 환불 언제까지 돼요? 택도 안 뜯었는데요.”
+
+assistant(1): “환불(청약철회) 가능 기간은 상품 상태와 배송 완료 시점에 따라 달라요. 배송 완료일이 언제인지, 그리고 사용/훼손 여부(라벨/포장 포함)를 확인해도 될까요?”
+
+user(2): “어제 배송완료고, 라벨도 그대로고 포장만 열어봤어요.”
+
+assistant(2): (툴) search_knowledge_base(query="단순변심 환불 가능 기간 배송완료 다음날 라벨 그대로 포장만 개봉")
+
+assistant(3): 검색 결과를 근거로 안내 + (필요하면) “주문번호 주시면 환불 가능 여부를 바로 확인해드릴까요?”로 확장 가능
+
+expected tool call
+
+tool: search_knowledge_base
+
+args: { "query": "단순변심 환불 가능 기간 배송완료 다음날 라벨 그대로 포장만 개봉" }
+
+3) “Slot Filling Rate” 측정이 잘 나오게 만드는 체크리스트
+
+첫 사용자 발화에 필수 슬롯을 1~2개는 반드시 누락시킬 것
+
+보완 질문은 “아무거나”가 아니라 툴 인자에 1:1로 매핑되게 만들 것
+(예: “주문번호요” / “교환할 사이즈요” / “수거주소 검색 키워드요”)
+
+5개가 서로 다른 패턴을 갖게 할 것
+(주문번호 누락만 반복 금지)
+--------------------------------

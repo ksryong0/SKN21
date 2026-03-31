@@ -1,0 +1,9 @@
+질문도 llm으로 만들 것. csv 파일을 전혀 참고하지 않음.
+argument accuracy 평가시 dialog 방식으로 변경.
+ground_truth를 2개 이상으로 변경.
+acceptable_arguments 정의했는가? null로 되어있음.
+약관/FAQ가 VectorDB에 있음 을 명시해야 함.
+데이터셋 몇개를 만들까? 평가용 20개. 최종 평가용 200~300개.
+액션 기준으로 평가.
+
+db에 평가를 위해 mock 데이터를 만들어서 테스트해야함.

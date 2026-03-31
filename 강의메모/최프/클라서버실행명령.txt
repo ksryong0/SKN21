@@ -1,0 +1,15 @@
+서버
+uv run uvicorn chatbot.server_fastapi:app --host 127.0.0.1 --port 8100
+
+모여 서버(벤치마크테스트시 실행)
+uv run python -m ecommerce.backend.app.main
+
+클라
+npm run dev --prefix ecommerce/frontend
+
+어댑터 실행
+python C:\Users\Playdata\Documents\SKN21_FINAL_5TEAM\SKN21-FINAL-5TEAM\chatbot\src\evaluation_adapter.py
+
+평가
+python C:\Users\Playdata\Documents\SKN21_FINAL_5TEAM\SKN21-FINAL-5TEAM\chatbot\chatbot_eval\benchmarkV2\FunctionChat-Bench\run_evaluate.py --llm gpt-4o-mini --mode 1 --trace 0
+
