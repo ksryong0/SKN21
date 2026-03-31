@@ -75,7 +75,7 @@ ssh-key 디렉토리로 이동
 터미널에서
 ssh -i my-server-sshkey.pem ubuntu@퍼블릭주소
 ssh -i my-server-sshkey.pem ubuntu@15.165.76.99
-ssh -i ryong.pem ubuntu@15.165.76.99
+ssh -i mypoll.pem ubuntu@3.37.0.153
 yes
 할거 다했으면 exit 누르면 됨.
 
@@ -172,9 +172,9 @@ c.NotebookApp.password는 아까 복사한거 붙여넣기.
 
 아래 세개를 복사해서 위에 연 파이썬 파일에서 c=get_config() 밑에 붙여넣기하고 들여쓰기 맞춰줌
 
-c.NotebookApp.ip = '10.0.15.161'
+c.NotebookApp.ip = '10.0.4.222'
 c.NotebookApp.open_browser = False
-c.NotebookApp.password = 'argon2:$argon2id$v=19$m=10240,t=10,p=8$HUYoTr9PjQB4/M2ZcahE1g$OraPlMYRh4HvKeiUvAVKHFW0GaBifm5ehidvn+ryz+U'
+c.NotebookApp.password = 'argon2:$argon2id$v=19$m=10240,t=10,p=8$rCvia2REosVfwA2tkXoYVA$rO1nmYimuvkd16S56SmM/YpPoWAYcS+LNmnhiu6jcsc'
 
 컨트롤 + s 누르고, 컨트롤 + x 누름.
 
